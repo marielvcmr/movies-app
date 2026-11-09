@@ -1,0 +1,48 @@
+# ── Dependencias ─────────────────────────────
+node_modules/
+.pnpm-store/
+ 
+# ── Variables de entorno ─────────────────────
+# Nunca subir claves (MONGODB_URI, JWT_SECRET, OMDB_API_KEY).
+.env
+.env.*
+!.env.example
+ 
+# ── Logs ─────────────────────────────────────
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+ 
+# ── Sistema operativo y editores ─────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+ 
+# ── Backend ──────────────────────────────────
+backend/dist/
+backend/coverage/
+ 
+# ── Frontend (Ionic + Angular) ───────────────
+frontend/www/
+frontend/dist/
+frontend/.angular/
+frontend/coverage/
+frontend/.sass-cache/
+ 
+# ── Capacitor / Android ──────────────────────
+frontend/android/.gradle/
+frontend/android/build/
+frontend/android/app/build/
+frontend/android/local.properties
+frontend/android/.idea/
+frontend/android/capacitor-cordova-android-plugins/
+frontend/android/app/src/main/assets/public/
+frontend/android/app/src/main/assets/capacitor.config.json
+frontend/android/app/src/main/assets/capacitor.plugins.json
+*.keystore
+*.jks
