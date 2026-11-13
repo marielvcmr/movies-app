@@ -26,6 +26,9 @@ Thumbs.db
 # ── Backend ──────────────────────────────────
 backend/dist/
 backend/coverage/
+backend/CLAUDE.md
+backend/IMPLEMENTATION_PLAN.md
+backend/.claude/
  
 # ── Frontend (Ionic + Angular) ───────────────
 frontend/www/
