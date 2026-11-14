@@ -25,7 +25,7 @@ const envSchema = z.object({
     .string({ error: 'is required' })
     .min(32, 'must be at least 32 characters'),
   JWT_EXPIRES_IN: z.string().min(1).default('7d'),
-  //OMDB_API_KEY: z.string({ error: 'is required' }).min(1, 'is required'),
+  OMDB_API_KEY: z.string({ error: 'is required' }).min(1, 'is required'),
   CORS_ORIGIN: z
     .string({ error: 'is required' })
     .min(1, 'is required')
