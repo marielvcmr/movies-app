@@ -113,3 +113,36 @@ export async function getProgramById(programId) {
   }
   return program;
 }
+
+// Results of importProgramWithDetail, for the seed script's summary.
+export const ImportResult = Object.freeze({
+  CREATED: 'created',
+  UPDATED: 'updated',
+  SKIPPED: 'skipped',
+  FAILED: 'failed',
+});
+
+// Imports one title with its full detail (used by the seed script).
+// Titles that already have their detail are skipped: no OMDb request, so re-runs are free.
+export async function importProgramWithDetail(externalId) {
+  const existing = await Program.findOne({ externalId });
+
+  if (existing?.detailFetchedAt) return ImportResult.SKIPPED;
+
+  // Stored from a search, but without detail: reuse the same logic as GET /programs/:id.
+  if (existing) {
+    await fillDetailFromOmdb(existing);
+    return existing.detailFetchedAt ? ImportResult.UPDATED : ImportResult.FAILED;
+  }
+
+  const detail = await getById(externalId);
+  if (!detail) return ImportResult.FAILED;
+
+  const Model = MODEL_BY_TYPE[detail.type];
+  await Model.create({
+    ...detail,
+    titleNormalized: normalizeTitle(detail.title),
+    detailFetchedAt: new Date(),
+  });
+  return ImportResult.CREATED;
+}
