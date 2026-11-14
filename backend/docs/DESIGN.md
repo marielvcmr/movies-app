@@ -129,7 +129,7 @@ Las reseñas de un `admin` cuentan en el promedio de usuarios normales.
 | `comment` | String \| null        | Opinión. **Opcional**, hasta 300 caracteres. |
 | `points`  | Number                | Puntaje entero del 1 al 100. |
 
-Una reseña por usuario y título. Para mostrar el nombre y el tipo del autor se usa `populate('author', 'username type')`.
+Una reseña por usuario y título. Para mostrar el nombre y el tipo del autor, la lista de reseñas de un título une cada reseña con su autor (`$lookup`) y devuelve solo `author: { _id, username, type }`.
 
 #### Estrellas
 

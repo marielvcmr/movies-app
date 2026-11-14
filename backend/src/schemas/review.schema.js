@@ -8,8 +8,11 @@ const commentTextSchema = z.string().trim().max(ReviewLimits.COMMENT_MAX);
 
 export const createReviewSchema = z.object({
   points: pointsSchema,
-  // Empty or missing comment → null, so the database never stores "".
-  comment: commentTextSchema.optional().transform((comment) => comment || null),
+  // A review can be only a score. Missing, null or "" comment → null, so the database never stores "".
+  comment: commentTextSchema
+    .nullable()
+    .optional()
+    .transform((comment) => comment || null),
 });
 
 export const updateReviewSchema = z

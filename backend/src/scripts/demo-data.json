@@ -1,0 +1,38 @@
+{
+  "users": [
+    { "username": "demo_ana", "email": "demo_ana@example.com", "type": "normal" },
+    { "username": "demo_bruno", "email": "demo_bruno@example.com", "type": "normal" },
+    { "username": "demo_carla", "email": "demo_carla@example.com", "type": "normal" },
+    { "username": "demo_diego", "email": "demo_diego@example.com", "type": "normal" },
+    { "username": "demo_elena", "email": "demo_elena@example.com", "type": "normal" },
+    { "username": "demo_felipe", "email": "demo_felipe@example.com", "type": "normal" },
+    { "username": "demo_gaby", "email": "demo_gaby@example.com", "type": "normal" },
+    { "username": "demo_hugo", "email": "demo_hugo@example.com", "type": "normal" },
+    { "username": "demo_critic_iris", "email": "demo_critic_iris@example.com", "type": "critic" },
+    { "username": "demo_critic_jorge", "email": "demo_critic_jorge@example.com", "type": "critic" },
+    { "username": "demo_critic_lucia", "email": "demo_critic_lucia@example.com", "type": "critic" }
+  ],
+  "comments": {
+    "high": [
+      "A masterpiece. I would watch it again tomorrow.",
+      "Brilliant from start to finish.",
+      "One of the best I have seen.",
+      "Great story and great acting.",
+      "It kept me hooked the whole time.",
+      "Beautiful and very well made."
+    ],
+    "mid": [
+      "Good, but a bit too long.",
+      "Enjoyable, with some slow parts.",
+      "Solid, but not memorable.",
+      "Nice to watch once.",
+      "Good idea, uneven execution."
+    ],
+    "low": [
+      "Not for me.",
+      "Too slow and predictable.",
+      "I expected much more.",
+      "The story did not work for me."
+    ]
+  }
+}

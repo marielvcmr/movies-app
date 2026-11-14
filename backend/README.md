@@ -37,7 +37,7 @@ flowchart LR
 | `clients`        | Cliente de OMDb. Es el único lugar que llama a la API externa y traduce sus respuestas. |
 | `constants`      | Enums, códigos de error, estados HTTP, reglas de campos y mapa de géneros de OMDb. Los que usa el frontend se copian tal cual. |
 | `config`, `utils` | Configuración y funciones compartidas.                                |
-| `scripts`        | `seed.js` y `seed-titles.json`: importa una lista inicial de títulos.  |
+| `scripts`        | `seed.js` y `seed-titles.json`: importa una lista inicial de títulos. `seed-demo.js` y `demo-data.json`: crea usuarios de prueba y reseñas generadas. |
 
 ---
 
@@ -72,7 +72,9 @@ Base: `/api/v1`. Todas las respuestas son JSON.
 | ------ | ---------------- | ------- | ----------- |
 | POST   | `/auth/register` | Público | Crea una cuenta con `type = normal`: `{ username, email, password }`. Responde `201 { token, user }`. Si se envía `type`, se ignora. |
 | POST   | `/auth/login`    | Público | `{ login, password }`, donde `login` es el username o el email. Responde `200 { token, user }`. |
-| GET    | `/auth/me`       | Usuario | Responde `{ user }`: el usuario de la sesión, con su email. |
+| GET    | `/auth/me`       | Usuario | Responde `200 { user }`: el usuario de la sesión, con su email. |
+
+`user` en las respuestas de Auth y de `PATCH /users/me`: `{ _id, username, email, type, createdAt, updatedAt }`. Nunca incluye `passwordHash`.
 
 Las reglas de `username`, `email` y `password` están en [`DESIGN.md`](docs/DESIGN.md#reglas-de-los-campos).
 
@@ -80,14 +82,27 @@ Las reglas de `username`, `email` y `password` están en [`DESIGN.md`](docs/DESI
 
 | Método | Ruta                  | Acceso  | Descripción |
 | ------ | --------------------- | ------- | ----------- |
-| PATCH  | `/users/me`           | Usuario | Edita la propia cuenta: `username`, `email` y/o `password`. |
-| DELETE | `/users/me`           | Usuario | Borra la propia cuenta y sus reseñas, y recalcula los promedios afectados. |
-| GET    | `/users/:id`          | Usuario | Perfil público: `{ username, type, createdAt, reviewsCount, pointsMean }`. Nunca devuelve el email. |
-| GET    | `/users/:id/reviews`  | Usuario | Reseñas del usuario, de la más reciente a la más antigua. |
-| GET    | `/users`              | Admin   | Lista para el módulo **Users**: `username`, `email`, `type`, `createdAt` y `reviewsCount`. Filtros: `q` (username o email), `type`, `page`, `limit`. |
-| PATCH  | `/users/:id/type`     | Admin   | `{ type: 'normal' \| 'critic' }`. Recalcula los promedios de los títulos que ese usuario reseñó. No permite crear admins ni cambiar a un admin. |
+| PATCH  | `/users/me`           | Usuario | Edita la propia cuenta: `username`, `email` y/o `password` (al menos uno). Responde `200 { user }`. `409` si el username o el email ya existen. |
+| DELETE | `/users/me`           | Usuario | Borra la propia cuenta y sus reseñas, y recalcula los promedios afectados. Responde `204` sin cuerpo. Después, el token deja de servir (`401`). |
+| GET    | `/users/:id`          | Usuario | Perfil público. Responde `200 { user: { _id, username, type, createdAt, reviewsCount, pointsMean } }`. Nunca devuelve el email. `pointsMean` es `null` si no tiene reseñas. `404` si no existe. |
+| GET    | `/users/:id/reviews`  | Usuario | Reseñas del usuario, de la más reciente a la más antigua. `page`, `limit`. Formato de cada elemento abajo. `404` si el usuario no existe. |
+| GET    | `/users`              | Admin   | Lista para el módulo **Users**, de la cuenta más nueva a la más vieja. Cada elemento: `{ _id, username, email, type, createdAt, reviewsCount }`. Filtros: `q` (username o email), `type`, `page`, `limit`. |
+| PATCH  | `/users/:id/type`     | Admin   | `{ type: 'normal' \| 'critic' }`. Responde `200 { user }`. Recalcula los promedios de los títulos que ese usuario reseñó. No permite crear admins ni cambiar a un admin (`403`). |
 
 `reviewsCount` y `pointsMean` se calculan al pedirlos, con una agregación sobre `reviews`; no se guardan en `users`.
+
+Cada elemento de `GET /users/:id/reviews` (`program` es un resumen del título; no incluye `author`):
+
+```json
+{
+  "_id": "…",
+  "points": 85,
+  "comment": "Texto o null",
+  "createdAt": "2026-03-03T00:00:00.000Z",
+  "updatedAt": "2026-03-03T00:00:00.000Z",
+  "program": { "_id": "…", "title": "Dune", "type": "movie", "year": 2021, "posterUrl": "https://… o null" }
+}
+```
 
 ### Programas (películas y series)
 
@@ -96,7 +111,9 @@ No hay creación, edición ni borrado de programas: solo se leen, y se traen de 
 | Método | Ruta               | Acceso  | Descripción |
 | ------ | ------------------ | ------- | ----------- |
 | GET    | `/programs`        | Usuario | Lista de una pestaña (*Movies* o *Series*) con búsqueda, filtros y orden (parámetros abajo). Si hay `q`, primero importa de OMDb los títulos que falten. |
-| GET    | `/programs/:id`    | Usuario | Ficha completa. La primera vez que se abre, completa los detalles desde OMDb. |
+| GET    | `/programs/:id`    | Usuario | Ficha completa. Responde `200 { program }`. La primera vez que se abre, completa los detalles desde OMDb. `404` si no existe. |
+
+Cada `program` (en la lista y en la ficha): `{ _id, type, externalId, title, synopsis, year, releaseDate, posterUrl, genres, actors, pointsMeanNormal, pointsMeanCritics, createdAt, updatedAt }`, más `durationMin` (películas) o `seasonsCount` (series). Los campos sin dato son `null`.
 
 Parámetros de `GET /programs`:
 
@@ -116,10 +133,20 @@ Parámetros de `GET /programs`:
 | Método | Ruta                          | Acceso  | Descripción |
 | ------ | ----------------------------- | ------- | ----------- |
 | GET    | `/programs/:id/reviews`       | Usuario | Reseñas del título, de la más reciente a la más antigua, con `author: { _id, username, type }`. `group=critics` (autores `critic`) o `group=audience` (autores `normal` y `admin`); sin `group`, todas. `page`, `limit`. |
-| GET    | `/programs/:id/reviews/mine`  | Usuario | La reseña del usuario de la sesión para ese título, o `404` si no tiene. |
-| POST   | `/programs/:id/reviews`       | Usuario | Crea la reseña: `{ points, comment? }`. `points` entero 1–100; `comment` opcional, hasta 300 caracteres. Una por usuario y título (`409` si ya existe). |
-| PATCH  | `/reviews/:id`                | Dueño   | Edita `points` y/o `comment`. |
-| DELETE | `/reviews/:id`                | Dueño   | Borra la reseña. Responde `204` sin cuerpo. |
+| GET    | `/programs/:id/reviews/mine`  | Usuario | Responde `200 { review }`: la reseña del usuario de la sesión para ese título, o `404` si no tiene. |
+| POST   | `/programs/:id/reviews`       | Usuario | Crea la reseña: `{ points, comment? }`. Responde `201 { review }`. `points` entero 1–100; `comment` opcional, hasta 300 caracteres (ver abajo). Una por usuario y título (`409` si ya existe). `404` si el título no existe. |
+| PATCH  | `/reviews/:id`                | Dueño   | Edita `points` y/o `comment` (al menos uno). Responde `200 { review }`. `404` si la reseña no existe; `403` si no es del usuario. |
+| DELETE | `/reviews/:id`                | Dueño   | Borra la reseña. Responde `204` sin cuerpo. `404` si la reseña no existe; `403` si no es del usuario. |
+
+**Comentario:** una reseña puede ser solo un puntaje. En `POST`, si `comment` no se envía, o es `null` o `""`, se guarda `null`. En `PATCH`, si `comment` no se envía, no cambia; `null` o `""` lo borra.
+
+`review` en las respuestas de `POST`, `PATCH` y `/mine` (`author` y `program` son solo ids):
+
+```json
+{ "_id": "…", "author": "…", "program": "…", "points": 85, "comment": "Texto o null", "createdAt": "…", "updatedAt": "…" }
+```
+
+En `GET /programs/:id/reviews`, cada elemento tiene los mismos campos, pero `author` es `{ _id, username, type }`.
 
 Cada vez que se crea, edita o borra una reseña, el servicio recalcula `pointsMeanNormal` y `pointsMeanCritics` del programa (ver [`DESIGN.md`](docs/DESIGN.md#puntajes)).
 
@@ -178,7 +205,8 @@ La app está en inglés, así que los textos de OMDb (título, sinopsis, actores
 | `JWT_SECRET`      | texto largo y aleatorio    | Clave para firmar los tokens. |
 | `JWT_EXPIRES_IN`  | `7d`                       | Duración del token. |
 | `OMDB_API_KEY`    | `a1b2c3d4`                 | Clave de OMDb. |
-| `CORS_ORIGIN`     | `http://localhost:8100,http://localhost` | Orígenes permitidos: `ionic serve` y la app de Android en desarrollo. |
+| `CORS_ORIGIN`     | `http://localhost:8100,http://localhost` | Orígenes permitidos, separados por coma: `ionic serve` (`http://localhost:8100`) y la app de Android (`http://localhost`). Para la app de iOS, agregar `capacitor://localhost`. |
+| `DEMO_USER_PASSWORD` | texto de 8–72 caracteres | Opcional. Contraseña de los usuarios de prueba que crea `pnpm seed:demo`. |
 
 ---
 
@@ -215,5 +243,6 @@ Los usuarios de prueba se insertan igual, con `type: "normal"` o `type: "critic"
 1. Dentro de `backend/`: `pnpm install`.
 2. Copiar `.env.example` a `.env` y completar los valores. La clave de OMDb se pide gratis en omdbapi.com → *API Key* y llega por email.
 3. `pnpm seed` → importa los títulos de `seed-titles.json`.
-4. Crear el administrador (ver arriba).
-5. `pnpm dev` → la API queda en `http://localhost:3000/api/v1`.
+4. Opcional: `pnpm seed:demo` → crea usuarios de prueba y reseñas (necesita `DEMO_USER_PASSWORD`). `pnpm seed:demo --reset` los borra.
+5. Crear el administrador (ver arriba).
+6. `pnpm dev` → la API queda en `http://localhost:3000/api/v1`.

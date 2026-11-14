@@ -56,6 +56,11 @@ export function getUserById(userId) {
   return User.findById(userId);
 }
 
+// Returns the user document with this exact username, or null.
+export function findUserByUsername(username) {
+  return User.findOne({ username });
+}
+
 // Applies the session user's own changes. Duplicates (username/email) → 409 via the error handler.
 export async function updateMe(user, { username, email, password }) {
   if (username !== undefined) user.username = username;
