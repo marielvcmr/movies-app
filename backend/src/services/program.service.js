@@ -146,3 +146,8 @@ export async function importProgramWithDetail(externalId) {
   });
   return ImportResult.CREATED;
 }
+
+// Returns the stored programs with these IMDb ids (used by the demo seed).
+export function getProgramsByExternalIds(externalIds) {
+  return Program.find({ externalId: { $in: externalIds } });
+}

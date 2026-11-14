@@ -1,3 +1,4 @@
+import { UserLimits } from '../constants/userLimits.js';
 import path from 'node:path';
 import dotenv from 'dotenv';
 import { z } from 'zod';
@@ -26,6 +27,13 @@ const envSchema = z.object({
     .min(32, 'must be at least 32 characters'),
   JWT_EXPIRES_IN: z.string().min(1).default('7d'),
   OMDB_API_KEY: z.string({ error: 'is required' }).min(1, 'is required'),
+    // Optional: shared password of the demo users (pnpm seed:demo). Same rules as any password.
+  DEMO_USER_PASSWORD: z
+    .string()
+    .min(UserLimits.PASSWORD_MIN)
+    .max(UserLimits.PASSWORD_MAX)
+    .regex(UserLimits.PASSWORD_PATTERN, 'must not contain spaces')
+    .optional(),
   CORS_ORIGIN: z
     .string({ error: 'is required' })
     .min(1, 'is required')
