@@ -32,11 +32,19 @@
   margin-top: 8px;
   padding: 14px;
   border-radius: 16px;
-  background: var(--sa-surface);
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: var(--sa-glass-bg); // liquid glass (theme/variables.scss)
+  border: 1px solid var(--sa-glass-border);
+  box-shadow: var(--sa-glass-shadow);
+  backdrop-filter: var(--sa-glass-blur);
+  -webkit-backdrop-filter: var(--sa-glass-blur);
+
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 
   &:focus-within {
     border-color: rgba(255, 90, 77, 0.65);
+    box-shadow: var(--sa-glass-shadow), var(--sa-glass-focus);
   }
 }
 
@@ -51,7 +59,7 @@ textarea {
   font: 500 14px/1.55 var(--ion-font-family);
 
   &::placeholder {
-    color: #8a817d;
+    color: #9a908c;
   }
 }
 

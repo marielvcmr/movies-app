@@ -36,34 +36,55 @@ ion-icon {
   font-size: 20px;
 }
 
-// ── Variants ─────────────────────────────────
-:host(.variant-primary) ion-button {
-  --background: var(--ion-color-primary);
-  --background-activated: var(--ion-color-primary-shade);
-  --color: #ffffff;
+// ── Variants (liquid glass, tokens in theme/variables.scss) ──
+// The blur goes on ion-button itself: its inner parts are in the shadow DOM.
+ion-button {
+  backdrop-filter: var(--sa-glass-blur);
+  -webkit-backdrop-filter: var(--sa-glass-blur);
+  border-radius: 999px;
 }
 
+// Red glass with a bright top edge and a soft red glow below.
+:host(.variant-primary) ion-button {
+  --background: var(--sa-glass-accent);
+  --background-activated: #ffffff;
+  --background-activated-opacity: 0.12;
+  --box-shadow: var(--sa-glass-accent-shadow);
+  --color: #ffffff;
+  --border-width: 1px;
+  --border-style: solid;
+  --border-color: rgba(255, 150, 140, 0.45);
+}
+
+// Clear glass.
 :host(.variant-outline) ion-button {
-  --background: transparent;
-  --background-activated: rgba(255, 255, 255, 0.06);
+  --background: var(--sa-glass-bg);
+  --background-activated: #ffffff;
+  --background-activated-opacity: 0.08;
+  --box-shadow: var(--sa-glass-shadow);
   --color: var(--ion-text-color);
   --border-width: 1px;
   --border-style: solid;
-  --border-color: rgba(255, 255, 255, 0.16);
+  --border-color: var(--sa-glass-border);
 }
 
+// Clear glass tinted red, for destructive actions.
 :host(.variant-danger) ion-button {
-  --background: transparent;
-  --background-activated: rgba(255, 122, 111, 0.1);
+  --background: linear-gradient(160deg, rgba(255, 122, 111, 0.16), rgba(255, 122, 111, 0.05));
+  --background-activated: #ff7a6f;
+  --background-activated-opacity: 0.12;
+  --box-shadow: var(--sa-glass-shadow);
   --color: var(--sa-danger-text);
   --border-width: 1px;
   --border-style: solid;
-  --border-color: rgba(255, 122, 111, 0.5);
+  --border-color: rgba(255, 122, 111, 0.45);
 }
 
-// Disabled: dark red instead of Ionic's default transparency.
+// Disabled: frosted dark red instead of Ionic's default transparency.
 :host(.variant-primary) ion-button.button-disabled {
-  --background: #4a1714;
+  --background: linear-gradient(160deg, rgba(140, 40, 33, 0.45), rgba(90, 24, 20, 0.45));
+  --box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --border-color: rgba(255, 150, 140, 0.15);
   --color: #b08a86;
   opacity: 1;
 }

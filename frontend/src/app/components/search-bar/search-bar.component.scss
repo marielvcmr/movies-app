@@ -2,23 +2,32 @@
   display: block;
 }
 
+// Glass field, like ion-input.sa-field (tokens in theme/variables.scss).
 ion-searchbar {
-  --background: var(--sa-surface);
+  --background: transparent; // the glass is on the host, below
   --color: var(--ion-text-color);
-  --placeholder-color: #8a817d;
+  --placeholder-color: #9a908c;
   --placeholder-opacity: 1;
   --icon-color: var(--sa-text-muted);
   --clear-button-color: var(--sa-text-muted);
-  --border-radius: 14px;
+  --border-radius: 16px;
   --box-shadow: none;
   padding: 0;
   min-height: 48px;
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  border-radius: 14px;
+  background: var(--sa-glass-bg);
+  border: 1px solid var(--sa-glass-border);
+  border-radius: 16px;
+  box-shadow: var(--sa-glass-shadow);
+  backdrop-filter: var(--sa-glass-blur);
+  -webkit-backdrop-filter: var(--sa-glass-blur);
   font-size: 14px;
   font-weight: 500;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 
 ion-searchbar.searchbar-has-focus {
   border-color: rgba(255, 90, 77, 0.65);
+  box-shadow: var(--sa-glass-shadow), var(--sa-glass-focus);
 }

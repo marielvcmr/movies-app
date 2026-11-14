@@ -4,8 +4,11 @@
   gap: 14px;
   padding: 12px;
   border-radius: 16px;
-  background: var(--sa-surface);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--sa-glass-bg); // liquid glass (theme/variables.scss)
+  border: 1px solid var(--sa-glass-border);
+  box-shadow: var(--sa-glass-shadow);
+  backdrop-filter: var(--sa-glass-blur);
+  -webkit-backdrop-filter: var(--sa-glass-blur);
 }
 
 .poster {

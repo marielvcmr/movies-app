@@ -158,3 +158,21 @@ Los mockups de todas las pantallas están en [Claude Design](https://claude.ai/a
 | Estrellas      | `#F5B83D` | Estrellas e icono de audiencia. |
 | Texto          | `#F4EFEC` | Texto principal. |
 | Texto suave    | `#A8A09C` | Etiquetas y datos secundarios. |
+
+### Estilo *liquid glass*
+
+Tarjetas, campos, selectores, botones, popups y la barra de pestañas son de **vidrio translúcido**: dejan ver borroso lo que hay detrás, con un borde claro arriba (como iOS). Todo se ajusta desde los tokens `--sa-glass-*` de `theme/variables.scss`:
+
+| Token | Uso |
+| ----- | --- |
+| `--sa-glass-bg`, `--sa-glass-border`, `--sa-glass-shadow`, `--sa-glass-blur` | El vidrio de tarjetas y campos: fondo degradado translúcido, borde, brillo superior + sombra, y desenfoque. |
+| `--sa-glass-bg-soft` | Piezas pequeñas dentro de una tarjeta: chips y botones de ícono. |
+| `--sa-glass-bar` | Vidrio más opaco: barra de pestañas flotante, pie fijo de Details y popups. |
+| `--sa-glass-accent`, `--sa-glass-accent-shadow` | Vidrio rojo: botón principal y opción seleccionada de los selectores. |
+| `--sa-glass-accent-soft` | Chips seleccionados y pestaña activa. |
+| `--sa-glass-focus` | Anillo rojo alrededor del campo con foco. |
+
+- El vidrio necesita color detrás: `global.scss` pone en `ion-content` unas luces suaves (rojo, ámbar y ciruela) sobre el fondo oscuro.
+- Clases globales: `.sa-field` (campos), `.sa-segment` (selectores), `.sa-sheet` (popups inferiores) y `.sa-glass` (cualquier panel).
+- La barra de pestañas flota sobre el contenido; las pestañas dejan espacio al final del scroll (`app-tabs ion-content` en `global.scss`).
+- Si un teléfono viejo va lento al hacer scroll, el desenfoque se apaga en un solo sitio: `--sa-glass-blur: none;`.

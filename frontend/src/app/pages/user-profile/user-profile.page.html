@@ -6,7 +6,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content [fullscreen]="true">
   @if (profile(); as p) {
   <main class="page">
     <app-user-profile-info [profile]="p" />

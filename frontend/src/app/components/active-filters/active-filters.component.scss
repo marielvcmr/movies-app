@@ -16,8 +16,9 @@
   height: 28px;
   padding: 0 10px;
   border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: transparent;
+  border: 1px solid var(--sa-glass-border);
+  background: var(--sa-glass-bg-soft); // liquid glass (theme/variables.scss)
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
   color: var(--sa-text-muted);
   font: 700 12px var(--ion-font-family);
   display: inline-flex;
@@ -31,8 +32,9 @@
 
 // A filter the user turned on: same red look as a selected chip in the popup.
 .chip.on {
-  border-color: var(--ion-color-primary);
-  background: rgba(219, 49, 37, 0.18);
+  border-color: rgba(255, 112, 98, 0.7);
+  background: var(--sa-glass-accent-soft);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
   color: #ffffff;
   cursor: pointer;
 

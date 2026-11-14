@@ -1,4 +1,5 @@
-// Background photo at the top, fading into the page color.
+// Background photo at the top. The mask fades it to transparent, so it melts into the
+// glows of the page background (global.scss) instead of ending in a solid color.
 .hero {
   position: absolute;
   top: 0;
@@ -6,6 +7,8 @@
   right: 0;
   height: 430px;
   overflow: hidden;
+  mask-image: linear-gradient(180deg, #000 40%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, #000 40%, transparent 100%);
 
   img {
     width: 100%;
@@ -17,12 +20,7 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(
-      180deg,
-      rgba(15, 11, 11, 0.25) 0%,
-      rgba(15, 11, 11, 0.7) 55%,
-      var(--ion-background-color) 100%
-    );
+    background: linear-gradient(180deg, rgba(15, 11, 11, 0.25) 0%, rgba(15, 11, 11, 0.7) 100%);
   }
 }
 

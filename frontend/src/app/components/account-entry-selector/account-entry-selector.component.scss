@@ -1,7 +1,7 @@
 :host {
   display: block;
 
-  // Shared segment styles live in global.scss (.sa-segment). Here only the darker
-  // background, because this one sits on top of the photo.
-  --sa-segment-background: rgba(0, 0, 0, 0.5);
+  // Shared segment styles live in global.scss (.sa-segment). Here only a darker glass,
+  // because this one sits on top of the photo.
+  --sa-segment-background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.35));
 }

@@ -7,9 +7,12 @@
   position: relative;
   width: 48px;
   height: 48px;
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  background: var(--sa-surface);
+  border-radius: 16px;
+  background: var(--sa-glass-bg); // liquid glass (theme/variables.scss)
+  border: 1px solid var(--sa-glass-border);
+  box-shadow: var(--sa-glass-shadow);
+  backdrop-filter: var(--sa-glass-blur);
+  -webkit-backdrop-filter: var(--sa-glass-blur);
   color: var(--ion-text-color);
   display: flex;
   align-items: center;
@@ -29,7 +32,8 @@
   height: 20px;
   padding: 0 5px;
   border-radius: 10px;
-  background: var(--ion-color-primary);
+  background: var(--sa-glass-accent);
+  box-shadow: var(--sa-glass-accent-shadow);
   color: #ffffff;
   font-size: 11px;
   font-weight: 800;
@@ -39,25 +43,7 @@
 }
 
 // ── Popup (bottom sheet) ───────────────────────
-ion-modal {
-  --background: #171111;
-  --border-radius: 24px;
-  --handle-background: rgba(255, 255, 255, 0.25);
-}
-
-ion-toolbar {
-  --background: #171111;
-  --border-width: 0;
-}
-
-ion-content {
-  --background: #171111;
-}
-
-ion-footer {
-  background: #171111;
-  border-top: 1px solid rgba(255, 255, 255, 0.07);
-}
+// The frosted glass of the sheet is shared: ion-modal.sa-sheet in global.scss.
 
 .sheet-header {
   display: flex;
@@ -74,8 +60,10 @@ ion-footer {
 .close {
   width: 44px;
   height: 44px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  background: var(--sa-glass-bg);
+  border: 1px solid var(--sa-glass-border);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
   color: var(--ion-text-color);
   display: flex;
   align-items: center;
@@ -145,8 +133,9 @@ h3 {
   height: 38px;
   padding: 0 14px;
   border-radius: 19px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: transparent;
+  border: 1px solid var(--sa-glass-border);
+  background: var(--sa-glass-bg-soft);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
   color: var(--sa-text-soft);
   font: 700 13px var(--ion-font-family);
   display: inline-flex;
@@ -160,20 +149,22 @@ h3 {
 }
 
 .chip.selected {
-  border-color: var(--ion-color-primary);
-  background: rgba(219, 49, 37, 0.18);
+  border-color: rgba(255, 112, 98, 0.7);
+  background: var(--sa-glass-accent-soft);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
   color: #ffffff;
 }
 
 // ── Category dropdown ──────────────────────────
 .genre-select {
-  --placeholder-color: #8a817d;
+  --placeholder-color: #9a908c;
   --placeholder-opacity: 1;
   min-height: 48px;
   padding: 0 14px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  background: #1f1818;
+  border-radius: 14px;
+  border: 1px solid var(--sa-glass-border);
+  background: var(--sa-glass-bg);
+  box-shadow: var(--sa-glass-shadow);
   font-size: 14px;
   font-weight: 600;
 }

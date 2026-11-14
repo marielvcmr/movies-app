@@ -1,17 +1,23 @@
-// ── Back button (same look as Details, on a solid box) ──
+// ── Glass back button, floating like in Details ──
+// Transparent toolbar + fullscreen ion-content: the page glows show behind the header.
 ion-toolbar {
-  --background: var(--ion-background-color);
+  --background: transparent;
   --border-width: 0;
   padding-inline: 8px;
 }
 
 ion-back-button {
-  --color: var(--ion-text-color);
-  --background: var(--sa-surface);
+  --color: #ffffff;
+  --background: var(--sa-glass-bg); // liquid glass (theme/variables.scss)
   --border-radius: 14px;
   --icon-font-size: 22px;
   width: 44px;
   height: 44px;
+  border: 1px solid var(--sa-glass-border);
+  border-radius: 14px;
+  box-shadow: var(--sa-glass-shadow);
+  backdrop-filter: var(--sa-glass-blur);
+  -webkit-backdrop-filter: var(--sa-glass-blur);
 }
 
 // ── Content ────────────────────────────────────

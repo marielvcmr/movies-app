@@ -1,4 +1,5 @@
-// Same layout as Ionic's own ion-tabs: content fills the space, bar at the bottom.
+// Content fills the whole screen; the glass tab bar floats on top of it, near the bottom,
+// so the cards slide under it and show blurred through it (liquid glass).
 :host {
   display: flex;
   flex-direction: column;
@@ -9,3 +10,14 @@
   flex: 1;
   contain: layout size style;
 }
+
+app-tab-bar {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  z-index: 10;
+}
+
+// The tab pages leave room at the end of their scroll for the bar: see "app-tabs ion-content"
+// in global.scss.

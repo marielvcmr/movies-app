@@ -26,4 +26,34 @@
   --sa-text-soft: #cfc6c2; // secondary paragraphs
   --sa-text-muted: #a8a09c; // labels and secondary data
   --sa-font-display: 'Bebas Neue', Impact, sans-serif; // titles
+
+  // ── Liquid glass ───────────────────────────
+  // Translucent layers that blur what is behind them, with a bright top edge, like iOS
+  // "liquid glass". Cards, fields, selectors, buttons, sheets and the tab bar use these, so
+  // the whole look is tuned here. The colored glows behind the pages are in global.scss.
+  --sa-glass-bg: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.11) 0%,
+    rgba(255, 255, 255, 0.04) 55%,
+    rgba(255, 255, 255, 0.07) 100%
+  ); // cards and fields
+  --sa-glass-bg-soft: rgba(255, 255, 255, 0.06); // small pieces inside a card (chips, icon buttons)
+  --sa-glass-border: rgba(255, 255, 255, 0.14);
+  --sa-glass-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18), inset 0 -1px 0 rgba(255, 255, 255, 0.03),
+    0 10px 30px rgba(0, 0, 0, 0.35); // light top edge + soft drop shadow
+  --sa-glass-blur: blur(20px) saturate(170%);
+  --sa-glass-bar: rgba(24, 17, 17, 0.62); // tab bar, fixed footers and sheets (more opaque)
+
+  // Red glass: primary button, selected option of a selector, selected chips.
+  --sa-glass-accent: linear-gradient(
+    160deg,
+    rgba(255, 112, 98, 0.95) 0%,
+    rgba(219, 49, 37, 0.9) 55%,
+    rgba(172, 33, 25, 0.92) 100%
+  );
+  --sa-glass-accent-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35), inset 0 -1px 0 rgba(0, 0, 0, 0.18), 0 8px 22px rgba(219, 49, 37, 0.32);
+  --sa-glass-accent-soft: linear-gradient(160deg, rgba(255, 112, 98, 0.32), rgba(219, 49, 37, 0.18)); // selected chips
+  --sa-glass-focus: 0 0 0 4px rgba(219, 49, 37, 0.18); // ring around a focused field
 }

@@ -2,10 +2,14 @@
   display: block;
 }
 
+// Glass card (tokens in theme/variables.scss).
 article {
-  border-radius: 16px;
-  background: var(--sa-surface);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 18px;
+  background: var(--sa-glass-bg);
+  border: 1px solid var(--sa-glass-border);
+  box-shadow: var(--sa-glass-shadow);
+  backdrop-filter: var(--sa-glass-blur);
+  -webkit-backdrop-filter: var(--sa-glass-blur);
   padding: 12px 14px;
 }
 
@@ -56,10 +60,10 @@ article {
   font-size: 11px;
 }
 
-// Inside the card the switch sits on the page background, like the mockup.
+// Inside the card the switch is a darker glass, so it stands out from the card.
 .type {
   margin-top: 10px;
-  --sa-segment-background: var(--ion-background-color);
+  --sa-segment-background: rgba(0, 0, 0, 0.25);
 }
 
 .admin {
