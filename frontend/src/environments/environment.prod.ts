@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  // TODO: the deployed API URL, once there is one.
-  apiUrl: 'http://localhost:3000/api/v1',
+  // Deployed backend (Render). The routes live under /api/v1.
+  apiUrl: 'https://movies-app-siho.onrender.com/api/v1',
 };
