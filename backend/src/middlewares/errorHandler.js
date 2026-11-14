@@ -1,3 +1,4 @@
+import { getDuplicateKeyFields } from '../utils/dbErrors.js';
 import { AppError } from '../utils/AppError.js';
 import { ErrorCode } from '../constants/errorCodes.js';
 import { HttpStatus } from '../constants/httpStatus.js';
@@ -11,6 +12,14 @@ function toAppError(err) {
 
   if (err.type === MALFORMED_JSON_ERROR_TYPE) {
     return new AppError(HttpStatus.BAD_REQUEST, 'Malformed JSON body');
+  }
+
+  // Unique index violation (e.g. email already registered) → 409 with the colliding field names.
+  const duplicateFields = getDuplicateKeyFields(err);
+  if (duplicateFields) {
+    return new AppError(HttpStatus.CONFLICT, `Already in use: ${duplicateFields.join(', ')}`, {
+      details: { fields: duplicateFields },
+    });
   }
 
   // Other client errors (4xx) from Express/body-parser that are marked safe to show (e.g. 413 body too large).
