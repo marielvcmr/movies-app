@@ -10,3 +10,7 @@ export async function login(req, res) {
   const session = await authService.login(req.validated.body);
   res.status(HttpStatus.OK).json(session);
 }
+
+export function me(req, res) {
+  res.status(HttpStatus.OK).json({ user: req.user });
+}
