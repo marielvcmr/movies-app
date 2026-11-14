@@ -47,6 +47,7 @@
         [hasMore]="hasMoreReviews()"
         [loading]="reviewsLoading()"
         [error]="reviewsError()"
+        [myUserId]="myUserId()"
         (loadMore)="loadMoreReviews()"
         (retry)="loadReviews(1)"
       />

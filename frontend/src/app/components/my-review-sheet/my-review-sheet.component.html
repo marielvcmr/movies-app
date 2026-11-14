@@ -1,7 +1,10 @@
+<!-- expandToScroll=false keeps the footer (Publish / Cancel + Save) visible at the 0.92 breakpoint;
+     without it the footer sits in the 8% of the sheet that is below the screen. Same as search-filter. -->
 <ion-modal
   [isOpen]="isOpen()"
   [initialBreakpoint]="0.92"
   [breakpoints]="[0, 0.92]"
+  [expandToScroll]="false"
   (willPresent)="prepare()"
   (didDismiss)="closed.emit()"
 >
@@ -37,7 +40,12 @@
         @if (error()) {
           <p class="error" role="alert">{{ error() }}</p>
         }
-        <app-button [disabled]="busy()" (click)="submit()">{{ saveLabel() }}</app-button>
+        <div class="buttons" [class.two]="isEdit()">
+          @if (isEdit()) {
+            <app-button class="cancel" variant="outline" [disabled]="busy()" (click)="closed.emit()">Cancel</app-button>
+          }
+          <app-button class="save" [disabled]="busy()" (click)="submit()">{{ saveLabel() }}</app-button>
+        </div>
       </div>
     </ion-footer>
   </ng-template>

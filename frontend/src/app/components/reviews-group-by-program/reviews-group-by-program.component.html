@@ -1,5 +1,7 @@
 @for (review of reviews(); track review._id) {
-  <app-review-details [review]="review" />
+  <a class="review-link" [routerLink]="authorLink(review)" routerDirection="forward">
+    <app-review-details [review]="review" />
+  </a>
 }
 
 @if (error()) {

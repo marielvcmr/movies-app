@@ -1,0 +1,19 @@
+<app-program-card-simple class="poster" [program]="program()" size="mini" [showName]="false" />
+
+<div class="info">
+  <div class="top">
+    <div class="text">
+      <p class="title">{{ program().title }}</p>
+      <p class="meta">{{ meta() }}</p>
+    </div>
+    <div class="points">
+      <span class="number font-display">{{ review().points }}</span><span class="max">/100</span>
+    </div>
+  </div>
+
+  <app-star-rating class="stars" [points]="review().points" [size]="14" />
+
+  @if (review().comment) {
+    <p class="comment">{{ review().comment }}</p>
+  }
+</div>

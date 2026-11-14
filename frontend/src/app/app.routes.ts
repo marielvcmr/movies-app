@@ -23,7 +23,7 @@ export const routes: Routes = [
       },
       {
         path: 'profile',
-        loadComponent: () => import('./pages/profile/profile.page').then((m) => m.ProfilePage),
+        loadComponent: () => import('./pages/my-profile/my-profile.page').then((m) => m.MyProfilePage),
       },
       {
         path: 'users',
@@ -42,6 +42,12 @@ export const routes: Routes = [
     path: 'programs/:id',
     canActivate: [authGuard],
     loadComponent: () => import('./pages/program-detail/program-detail.page').then((m) => m.ProgramDetailPage),
+  },
+  {
+    // Public profile of another user, opened from their reviews. Outside the tabs, like Details.
+    path: 'users/:id',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/user-profile/user-profile.page').then((m) => m.UserProfilePage),
   },
   {
     // authGuard sends people without a session to /login.

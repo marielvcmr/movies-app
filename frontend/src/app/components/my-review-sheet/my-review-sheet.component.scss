@@ -78,6 +78,13 @@ ion-footer {
   padding: 12px 20px calc(16px + env(safe-area-inset-bottom));
 }
 
+// Editing: Cancel and Save changes side by side.
+.buttons.two {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
 .error {
   margin: 0 0 10px;
   text-align: center;

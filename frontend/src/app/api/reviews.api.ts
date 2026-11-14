@@ -8,12 +8,7 @@ import { REVIEWS_PAGE_SIZE } from '../constants/review-limits';
 import type { Page } from '../models/api.model';
 import type { ProgramReview, Review, ReviewGroup, ReviewInput } from '../models/review.model';
 
-import { mockListReviews } from './mocks/reviews.mock';
-
 // Calls about reviews (backend/README.md → Reseñas).
-//   Ready in the backend:  create, getMine.
-//   Not yet (Step 15):     listByProgram (sample data while environment.mockReviewList is true),
-//                          update and remove (they answer 404 until the backend adds them).
 @Injectable({ providedIn: 'root' })
 export class ReviewsApi {
   private http = inject(HttpClient);
@@ -22,8 +17,6 @@ export class ReviewsApi {
 
   // GET /programs/:id/reviews?group=critics|audience — newest first, with the author's name and type.
   listByProgram(programId: string, group: ReviewGroup, page: number): Observable<Page<ProgramReview>> {
-    if (environment.mockReviewList) return mockListReviews(group, page, REVIEWS_PAGE_SIZE);
-
     const params = new HttpParams().set('group', group).set('page', page).set('limit', REVIEWS_PAGE_SIZE);
     return this.http.get<Page<ProgramReview>>(`${this.programsUrl}/${programId}/reviews`, { params });
   }

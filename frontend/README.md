@@ -81,14 +81,14 @@ La app tiene dos módulos para todos los usuarios, **Home** y **My profile**, y 
 | `/tabs/home`            | Home            | Usuario | Pestañas **Movies** y **Series**. Buscador por nombre y panel de filtros: categoría, año (desde / hasta), puntaje mínimo de críticos, puntaje mínimo de audiencia y orden. Por defecto, de la más nueva a la más vieja. Películas y series usan la misma tarjeta. |
 | `/programs/:id`         | Details         | Usuario | Todos los campos del programa: carátula, título, tipo, año, fecha de estreno, duración (películas) o temporadas (series), categorías, sinopsis y actores. Los dos promedios (críticos y audiencia) con estrellas. Reseñas separadas en *Critics* / *Audience*. Botón *Write a review*. |
 | `/programs/:id/review`  | My review       | Usuario | Crear o editar la propia reseña: puntaje 1–100 con deslizador y estrellas en vivo, y comentario opcional (máx. 300). Al editar, permite borrarla. |
-| `/users/:id`            | Profile         | Usuario | Perfil público, solo datos no sensibles: username, fecha de registro, tipo, cantidad de reseñas, promedio de puntos dados y sus reseñas. |
-| `/tabs/profile`         | My profile      | Usuario | Mis datos (incluido mi email), tipo, estadísticas y mis reseñas con editar y borrar. Editar perfil, cerrar sesión y borrar cuenta. |
-| `/tabs/profile/edit`    | Edit profile    | Usuario | Username, email y, opcionalmente, nueva contraseña con confirmación. El tipo se muestra pero no se puede cambiar. |
+| `/users/:id`            | Profile         | Usuario | Perfil público (`UserProfilePage`), solo datos no sensibles: username, fecha de registro, tipo, cantidad de reseñas, promedio de puntos dados y sus reseñas. Cada reseña abre Details. |
+| `/tabs/profile`         | My profile      | Usuario | `MyProfilePage`: mis datos (incluido mi email), tipo, estadísticas y mis reseñas con editar (mismo popup que Details) y borrar. Cerrar sesión y borrar cuenta. *Edit profile*: pendiente. |
+| `/tabs/profile/edit`    | Edit profile    | Usuario | *(Pendiente)* Username, email y, opcionalmente, nueva contraseña con confirmación. El tipo se muestra pero no se puede cambiar. |
 | `/tabs/users`           | Users           | Admin   | Buscar usuarios por username o email, filtrar por tipo y cambiar a cada uno entre *Normal* y *Critic*. Los admins aparecen marcados y no se pueden cambiar. |
 
 - Todas las rutas, salvo `/login`, usan `authGuard`. Sin sesión se va al login.
 - La pestaña **Users** solo aparece si `type = admin`, y la ruta está protegida con `adminGuard`.
-- Al tocar el nombre del autor de una reseña se abre su perfil público (`/users/:id`).
+- Al tocar una reseña en Details se abre el perfil público de su autor (`/users/:id`); si es la propia, se abre *My profile*.
 - **Toda la interfaz está en inglés**, igual que los datos de OMDb. Los enums se muestran con las etiquetas de `constants` (ej. `science_fiction` → "Sci-Fi").
 
 ### Puntajes y estrellas
@@ -112,7 +112,7 @@ La app tiene dos módulos para todos los usuarios, **Home** y **My profile**, y 
 | `search-bar`      | Home         | Buscador por nombre: `[(query)]`, espera 350 ms después de la última tecla. |
 | `search-filter`   | Home         | Botón con contador + popup (hoja inferior): orden, categorías (dropdown que va añadiendo chips), rango de años y estrellas mínimas de críticos y audiencia. `[(filters)]`; solo aplica al tocar *Apply*. |
 | `active-filters`  | Home         | Debajo del buscador: un chip por filtro activo (orden, cada categoría, años, estrellas de críticos y de audiencia). La × de cada chip quita ese filtro; *Clear* vuelve a los valores por defecto. `[(filters)]`. |
-| `program-card-simple` | Home, Details, My review | Carátula de un programa: imagen de OMDb o recuadro de color con el título; icono de película o serie según `type`. `size="large" \| "small"`. |
+| `program-card-simple` | Home, Details, My review, perfiles | Carátula de un programa: imagen de OMDb o recuadro de color con el título; icono de película o serie según `type`. `size="large" \| "small" \| "mini"`. `[showName]="false"` quita el título del recuadro (cuando el nombre ya está escrito al lado). |
 | `program-home-card` | Home       | `program-card-simple` + título, año, dos primeras categorías y los dos promedios. |
 | `program-detail-card` | Details  | `program-card-simple` pequeña + tipo, título y año · duración (película) o temporadas (serie). |
 | `score-detail-card` | Details    | Un promedio: `group="critics"` (insignia roja, `pointsMeanCritics`) o `group="audience"` (personas amarillas, `pointsMeanNormal`). Número, estrellas y cantidad de reseñas. |
@@ -122,16 +122,22 @@ La app tiene dos módulos para todos los usuarios, **Home** y **My profile**, y 
 | `actor-chip`      | Details      | Un actor: círculo con su inicial + nombre. |
 | `detail-section`  | Details      | Bloque con título (`heading`) y contenido libre entre las etiquetas: *Synopsis*, *Actors*. |
 | `user-type-selector` | Details   | Selector *Critics / Audience* de las reseñas: `[(group)]`. |
-| `reviews-group-by-program` | Details | Las reseñas de un grupo (`review-details` × N), *Load more reviews* y mensajes de vacío / error. Emite `(loadMore)` y `(retry)`. |
-| `review-details`  | Details, perfiles | Una reseña: avatar con inicial, username, insignia *Critic*, fecha, puntaje /100, estrellas y comentario si lo hay. |
-| `my-review-sheet` | Details      | Popup *Write a review* / *Edit review* (hoja inferior, como el de filtros) con `program-review-card`, `my-score-card` y `my-comment-section`; *Delete review* al editar. No llama a la API: emite `(submitted)` y `(deleted)`. |
-| `program-review-card` | Write a review, perfiles | `program-card-simple size="mini"` + título + "Movie · 2024 · 166 min". |
+| `reviews-group-by-program` | Details | Las reseñas de un grupo (`review-details` × N), *Load more reviews* y mensajes de vacío / error. Cada reseña enlaza al perfil de su autor; con `myUserId`, la propia enlaza a *My profile*. Emite `(loadMore)` y `(retry)`. |
+| `review-details`  | Details | Una reseña: avatar con inicial, username, insignia *Critic*, fecha, puntaje /100, estrellas y comentario si lo hay. |
+| `my-review-sheet` | Details, My profile | Popup *Write a review* / *Edit review* (hoja inferior, como el de filtros) con `program-review-card`, `my-score-card` y `my-comment-section`. Al editar: *Delete review* y los botones *Cancel* + *Save changes*. No llama a la API: emite `(submitted)`, `(deleted)` y `(closed)`. |
+| `program-review-card` | Write a review | `program-card-simple size="mini"` + título + "Movie · 2024 · 166 min" (sin duración si recibe un `ProgramSummary`). |
 | `my-score-card`   | Write a review | *Your score*: número grande, estrellas en vivo, deslizador 1–100 y `score-stars`. `[(points)]`. |
 | `score-stars`     | Write a review | La escala 1–20 … 81–100 = 1 … 5 estrellas, con la franja del puntaje actual resaltada. |
 | `my-comment-section` | Write a review | Comentario opcional con contador 0/300 y aviso de a qué promedio cuenta según `userType` (critic → Critics; normal/admin → Audience). `[(comment)]`. |
 | `star-rating`     | Details, filtros, My review, perfiles | Las 5 estrellas a partir de `points` (o directamente `stars`). |
 | `tab-bar`         | Home, My profile, Users | Pestañas inferiores; *Users* solo si `showUsers` (admin). |
-| `user-type-badge` | Perfiles, Users | *(Pendiente)* Insignia *Normal user*, *Critic* o *Admin*. |
+| `user-type-badge` | Perfiles, Users | Insignia *Normal user* (gris), *Critic* (roja) o *Admin* (amarilla). `[showIcon]` añade el icono de insignia. |
+| `my-profile-info` | My profile   | Avatar con inicial, username, `user-type-badge`, *Member since* y el email (*Only you can see your email*). |
+| `user-profile-info` | Profile    | Lo mismo centrado y sin email: avatar, username, `user-type-badge` con icono y *Member since*. |
+| `profile-reviews-card` | My profile, Profile | Recuadro *Reviews*: cantidad de reseñas del usuario. |
+| `profile-points-card` | My profile, Profile | Recuadro *Avg. points given*: promedio de puntos /100, o "—" sin reseñas. |
+| `my-profile-program-card` | My profile | Una reseña propia: `program-card-simple size="mini" [showName]="false"` + título (enlace a Details), "Movie · 2024", puntaje y estrellas. Botones editar y borrar: emite `(edit)` y `(delete)`. |
+| `user-program-card` | Profile    | Una reseña de otro usuario: `program-card-simple size="mini" [showName]="false"` + título, "Movie · 2024", puntaje /100, estrellas y comentario. La página la enlaza a Details. |
 
 ---
 

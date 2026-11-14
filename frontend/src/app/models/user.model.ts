@@ -15,3 +15,14 @@ export interface User {
   createdAt: string;
   updatedAt: string;
 }
+
+// Public profile of any user (GET /users/:id). Never has the email.
+// The two numbers are calculated from the user's reviews; pointsMean is null without reviews.
+export interface PublicProfile {
+  _id: string;
+  username: string;
+  type: UserType;
+  createdAt: string;
+  reviewsCount: number;
+  pointsMean: number | null;
+}

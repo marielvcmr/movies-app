@@ -8,6 +8,7 @@ import { StarRatingComponent } from '../star-rating/star-rating.component';
 
 // One review in Details: avatar with the author's initial, username, "Critic" badge
 // (only for critics), date, points /100, stars and the comment if there is one.
+// reviews-group-by-program wraps it in the link to the author's profile.
 // <app-review-details [review]="review" />
 @Component({
   selector: 'app-review-details',

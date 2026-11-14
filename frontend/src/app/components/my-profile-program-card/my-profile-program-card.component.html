@@ -1,0 +1,25 @@
+<a class="program-link" [routerLink]="['/programs', program()._id]" routerDirection="forward">
+  <app-program-card-simple class="poster" [program]="program()" size="mini" [showName]="false" />
+  <div class="text">
+    <p class="title">{{ program().title }}</p>
+    <p class="meta">{{ meta() }}</p>
+    <div class="score">
+      <span class="number font-display">{{ review().points }}</span>
+      <app-star-rating [points]="review().points" [size]="13" />
+    </div>
+  </div>
+</a>
+
+<div class="actions">
+  <button type="button" class="edit" [attr.aria-label]="'Edit review of ' + program().title" (click)="edit.emit()">
+    <ion-icon name="create-outline" aria-hidden="true" />
+  </button>
+  <button
+    type="button"
+    class="delete"
+    [attr.aria-label]="'Delete review of ' + program().title"
+    (click)="delete.emit()"
+  >
+    <ion-icon name="trash-outline" aria-hidden="true" />
+  </button>
+</div>

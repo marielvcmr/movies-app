@@ -1,0 +1,51 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/home" text="" aria-label="Back" />
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  @if (profile(); as p) {
+  <main class="page">
+    <app-user-profile-info [profile]="p" />
+
+    <div class="stats">
+      <app-profile-reviews-card [count]="p.reviewsCount" />
+      <app-profile-points-card [points]="p.pointsMean" />
+    </div>
+
+    <section class="reviews">
+      <h2 class="font-display">Reviews</h2>
+
+      <div class="list">
+        @for (review of reviews(); track review._id) {
+        <a class="card-link" [routerLink]="['/programs', review.program._id]" routerDirection="forward">
+          <app-user-program-card [review]="review" />
+        </a>
+        } @if (reviewsError()) {
+        <div class="message" role="alert">
+          <p>{{ reviewsError() }}</p>
+          <button type="button" class="link" (click)="loadReviews(1)">Try again</button>
+        </div>
+        } @else if (reviewsLoading()) {
+        <div class="loading"><ion-spinner name="crescent" aria-label="Loading reviews" /></div>
+        } @else if (!reviews().length) {
+        <p class="message">{{ p.username }} hasn't reviewed anything yet.</p>
+        } @else if (hasMoreReviews()) {
+        <button type="button" class="load-more" (click)="loadMoreReviews()">Load more reviews</button>
+        }
+      </div>
+    </section>
+  </main>
+  } @else if (error()) {
+  <div class="message" role="alert">
+    <p class="message-title">Couldn't load this profile</p>
+    <p>{{ error() }}</p>
+    <button type="button" class="link" (click)="load()">Try again</button>
+  </div>
+  } @else {
+  <div class="loading"><ion-spinner name="crescent" aria-label="Loading" /></div>
+  }
+</ion-content>

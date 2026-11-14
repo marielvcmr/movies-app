@@ -100,6 +100,8 @@ export class ProgramDetailPage implements OnInit {
   saving = signal(false);
   sheetError = signal<string | null>(null);
   userType = computed(() => this.auth.user()?.type ?? UserType.NORMAL);
+  // Tapping my own review in the list opens My profile instead of the public profile.
+  myUserId = computed(() => this.auth.user()?._id ?? null);
   reviewButtonLabel = computed(() => (this.myReview() ? 'Edit your review' : 'Write a review'));
 
   constructor() {

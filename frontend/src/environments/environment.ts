@@ -6,10 +6,6 @@ export const environment = {
   production: false,
   // Backend base URL. On a phone over USB, run `adb reverse tcp:3000 tcp:3000` first (see README).
   apiUrl: 'http://localhost:3000/api/v1',
-  // The backend doesn't have GET /programs/:id/reviews yet. While this is true, the Critics /
-  // Audience list in Details shows the sample reviews of api/mocks/reviews.mock.ts.
-  // Set it to false once that endpoint exists.
-  mockReviewList: true,
 };
 
 /*

@@ -1,0 +1,7 @@
+<span class="avatar font-display" [style.background-color]="avatar()" aria-hidden="true">{{ initial() }}</span>
+<h1 class="username font-display">{{ profile().username }}</h1>
+<app-user-type-badge class="badge" [type]="profile().type" [showIcon]="true" />
+<p class="since">
+  <ion-icon name="calendar-outline" aria-hidden="true" />
+  Member since {{ memberSince() }}
+</p>

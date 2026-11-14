@@ -1,0 +1,64 @@
+<ion-content>
+  <main class="page">
+    <header class="top">
+      <h1 class="font-display">My profile</h1>
+      <button type="button" class="icon-button" aria-label="Log out" (click)="logout()">
+        <ion-icon name="log-out-outline" aria-hidden="true" />
+      </button>
+    </header>
+
+    @if (auth.user(); as user) {
+    <app-my-profile-info class="info" [user]="user" />
+    }
+
+    <!-- Stats: number of reviews and average points given. -->
+    @if (profile(); as p) {
+    <div class="stats">
+      <app-profile-reviews-card [count]="p.reviewsCount" />
+      <app-profile-points-card [points]="p.pointsMean" />
+    </div>
+    } @else if (profileError()) {
+    <div class="message" role="alert">
+      <p>{{ profileError() }}</p>
+      <button type="button" class="link" (click)="loadProfile()">Try again</button>
+    </div>
+    }
+
+    <app-button class="delete-account" variant="danger" (click)="askDeleteAccount()">Delete account</app-button>
+
+    <section class="reviews">
+      <h2 class="font-display">My reviews</h2>
+
+      <div class="list">
+        @for (review of reviews(); track review._id) {
+        <app-my-profile-program-card [review]="review" (edit)="openEdit(review)" (delete)="askDeleteReview(review)" />
+        } @if (reviewsError()) {
+        <div class="message" role="alert">
+          <p>{{ reviewsError() }}</p>
+          <button type="button" class="link" (click)="loadReviews(1)">Try again</button>
+        </div>
+        } @else if (reviewsLoading()) {
+        <div class="loading"><ion-spinner name="crescent" aria-label="Loading your reviews" /></div>
+        } @else if (!reviews().length) {
+        <p class="message">You haven't reviewed anything yet.</p>
+        } @else if (hasMoreReviews()) {
+        <button type="button" class="load-more" (click)="loadMoreReviews()">Load more reviews</button>
+        }
+      </div>
+    </section>
+  </main>
+</ion-content>
+
+@if (editing(); as review) {
+<app-my-review-sheet
+  [isOpen]="sheetOpen()"
+  [program]="review.program"
+  [review]="review"
+  [userType]="userType()"
+  [busy]="saving()"
+  [error]="sheetError()"
+  (submitted)="saveReview($event)"
+  (deleted)="deleteEditing()"
+  (closed)="sheetOpen.set(false)"
+/>
+}

@@ -46,16 +46,13 @@ describe('ReviewsApi', () => {
     expect((await result)._id).toBe('r1');
   });
 
-  it('the sample list is split by group and paginated', async () => {
-    const critics = await firstValueFrom(api.listByProgram('p1', 'critics', 1));
-    expect(critics.data.every((r) => r.author.type === 'critic')).toBe(true);
-    expect(critics.data.length).toBe(5);
-    expect(critics.total).toBe(6);
-
-    const page2 = await firstValueFrom(api.listByProgram('p1', 'critics', 2));
-    expect(page2.data.length).toBe(1);
-
-    const audience = await firstValueFrom(api.listByProgram('p1', 'audience', 1));
-    expect(audience.data.some((r) => r.author.type === 'critic')).toBe(false);
+  it('listByProgram asks for one group and one page', async () => {
+    const result = firstValueFrom(api.listByProgram('p1', 'critics', 2));
+    const req = http.expectOne((r) => r.url === `${programUrl}/reviews`);
+    expect(req.request.params.get('group')).toBe('critics');
+    expect(req.request.params.get('page')).toBe('2');
+    expect(req.request.params.get('limit')).toBe('5');
+    req.flush({ data: [], page: 2, limit: 5, total: 6 });
+    expect((await result).total).toBe(6);
   });
 });

@@ -8,3 +8,6 @@ export const REVIEW_POINTS_DEFAULT = 70;
 
 // Reviews per "page" of the Critics / Audience list.
 export const REVIEWS_PAGE_SIZE = 5;
+
+// Reviews per "page" of the lists in My profile and in a user's profile.
+export const PROFILE_REVIEWS_PAGE_SIZE = 10;

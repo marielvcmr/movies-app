@@ -1,5 +1,6 @@
 import type { Genre, ProgramSort, ProgramType } from '../models/program.model';
 import type { ReviewGroup } from '../models/review.model';
+import type { UserType } from '../models/user.model';
 
 // The API stores stable keys ('science_fiction'); the app shows these English labels ("Sci-Fi").
 // `Record<Genre, string>` makes TypeScript complain if a genre is missing here.
@@ -49,4 +50,11 @@ export const SORT_LABELS: Record<ProgramSort, string> = {
 export const REVIEW_GROUP_LABELS: Record<ReviewGroup, string> = {
   critics: 'Critics',
   audience: 'Audience',
+};
+
+// Badge of each user type (profiles, Users module).
+export const USER_TYPE_LABELS: Record<UserType, string> = {
+  normal: 'Normal user',
+  critic: 'Critic',
+  admin: 'Admin',
 };
