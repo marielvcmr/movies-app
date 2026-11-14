@@ -1,0 +1,443 @@
+{
+  "info": {
+    "name": "SpoilerAlert - Step 16 (users: profile, admin, type change, delete account)",
+    "description": "Runs in order. Registers a temporary user (tmp_<time>), uses it, and deletes it at the end with DELETE /users/me.\n\nBEFORE YOU RUN:\n1. The API runs (pnpm dev).\n2. The admin user (default username: admin) has type \"admin\" in Atlas.\n3. Set adminPassword (Current value in the app, or --env-var in the CLI). Never put it in the INITIAL VALUE.\n4. At least one stored movie has no reviews (the Step 15 collection leaves one clean).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000/api/v1" },
+    { "key": "adminLogin", "value": "admin" },
+    { "key": "adminPassword", "value": "" },
+    { "key": "tempPassword", "value": "temppass123" },
+    { "key": "tokenAdmin", "value": "" },
+    { "key": "adminId", "value": "" },
+    { "key": "tempUsername", "value": "" },
+    { "key": "tempEmail", "value": "" },
+    { "key": "tokenTemp", "value": "" },
+    { "key": "tempId", "value": "" },
+    { "key": "programId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "0. Setup",
+      "item": [
+        {
+          "name": "Log in: admin user",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('login works (check adminLogin / adminPassword and that pnpm dev runs)', () => pm.response.to.have.status(200));",
+            "const isAdmin = pm.response.code === 200 && pm.response.json().user.type === 'admin';",
+            "pm.test('user type is admin (set it in Atlas if this fails)', () => pm.expect(isAdmin).to.eql(true));",
+            "if (isAdmin) {",
+            "  pm.collectionVariables.set('tokenAdmin', pm.response.json().token);",
+            "  pm.collectionVariables.set('adminId', pm.response.json().user._id);",
+            "} else {",
+            "  pm.execution.setNextRequest(null);",
+            "}"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "auth": { "type": "noauth" },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"login\": \"{{adminLogin}}\", \"password\": \"{{adminPassword}}\" }", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        {
+          "name": "Register a temporary user -> 201",
+          "event": [
+            { "listen": "prerequest", "script": { "type": "text/javascript", "exec": [
+              "const suffix = Date.now();",
+              "pm.collectionVariables.set('tempUsername', 'tmp_' + suffix);",
+              "pm.collectionVariables.set('tempEmail', 'tmp_' + suffix + '@example.com');"
+            ] } },
+            { "listen": "test", "script": { "type": "text/javascript", "exec": [
+              "pm.test('status 201', () => pm.response.to.have.status(201));",
+              "if (pm.response.code === 201) {",
+              "  pm.collectionVariables.set('tokenTemp', pm.response.json().token);",
+              "  pm.collectionVariables.set('tempId', pm.response.json().user._id);",
+              "} else {",
+              "  pm.execution.setNextRequest(null);",
+              "}"
+            ] } }
+          ],
+          "request": {
+            "method": "POST",
+            "auth": { "type": "noauth" },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"username\": \"{{tempUsername}}\", \"email\": \"{{tempEmail}}\", \"password\": \"{{tempPassword}}\" }", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/auth/register"
+          }
+        },
+        {
+          "name": "Pick a movie without reviews",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 200', () => pm.response.to.have.status(200));",
+            "const movies = pm.response.code === 200 ? pm.response.json().data : [];",
+            "const free = movies.find((movie) => movie.pointsMeanNormal === null && movie.pointsMeanCritics === null);",
+            "pm.test('a movie without reviews exists (search more movies with ?q= if this fails)', () => pm.expect(free).to.not.equal(undefined));",
+            "if (free) {",
+            "  pm.collectionVariables.set('programId', free._id);",
+            "} else {",
+            "  pm.execution.setNextRequest(null);",
+            "}"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenTemp}}", "type": "string" }] },
+            "url": "{{baseUrl}}/programs?type=movie&limit=50"
+          }
+        },
+        {
+          "name": "Temporary user reviews the movie (60) -> 201",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 201', () => pm.response.to.have.status(201));",
+            "if (pm.response.code !== 201) pm.execution.setNextRequest(null);"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenTemp}}", "type": "string" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"points\": 60 }", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/programs/{{programId}}/reviews"
+          }
+        }
+      ]
+    },
+    {
+      "name": "1. Public profile and reviews of a user",
+      "item": [
+        {
+          "name": "Public profile -> stats, no email",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 200', () => pm.response.to.have.status(200));",
+            "const user = pm.response.json().user;",
+            "pm.test('username is the temporary user', () => pm.expect(user.username).to.eql(pm.variables.get('tempUsername')));",
+            "pm.test('type is normal', () => pm.expect(user.type).to.eql('normal'));",
+            "pm.test('reviewsCount is 1', () => pm.expect(user.reviewsCount).to.eql(1));",
+            "pm.test('pointsMean is 60', () => pm.expect(user.pointsMean).to.eql(60));",
+            "pm.test('no email and no passwordHash', () => pm.expect(user).to.not.have.any.keys('email', 'passwordHash'));"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenAdmin}}", "type": "string" }] },
+            "url": "{{baseUrl}}/users/{{tempId}}"
+          }
+        },
+        {
+          "name": "Reviews of the user -> 1, with program summary",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 200', () => pm.response.to.have.status(200));",
+            "const body = pm.response.json();",
+            "pm.test('total is 1', () => pm.expect(body.total).to.eql(1));",
+            "pm.test('points is 60', () => pm.expect(body.data[0].points).to.eql(60));",
+            "pm.test('program is the reviewed movie', () => pm.expect(body.data[0].program._id).to.eql(pm.variables.get('programId')));",
+            "pm.test('program has a title', () => pm.expect(body.data[0].program.title).to.be.a('string'));"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenTemp}}", "type": "string" }] },
+            "url": "{{baseUrl}}/users/{{tempId}}/reviews"
+          }
+        },
+        {
+          "name": "Invalid user id -> 400",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 400', () => pm.response.to.have.status(400));",
+            "pm.test('code is VALIDATION_ERROR', () => pm.expect(pm.response.json().error.code).to.eql('VALIDATION_ERROR'));"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenTemp}}", "type": "string" }] },
+            "url": "{{baseUrl}}/users/abc"
+          }
+        },
+        {
+          "name": "Unknown user id -> 404",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 404', () => pm.response.to.have.status(404));",
+            "pm.test('code is NOT_FOUND', () => pm.expect(pm.response.json().error.code).to.eql('NOT_FOUND'));"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenTemp}}", "type": "string" }] },
+            "url": "{{baseUrl}}/users/000000000000000000000000"
+          }
+        },
+        {
+          "name": "No session -> 401",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 401', () => pm.response.to.have.status(401));"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "auth": { "type": "noauth" },
+            "url": "{{baseUrl}}/users/{{tempId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Admin list of users",
+      "item": [
+        {
+          "name": "Non-admin -> 403",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 403', () => pm.response.to.have.status(403));",
+            "pm.test('code is FORBIDDEN', () => pm.expect(pm.response.json().error.code).to.eql('FORBIDDEN'));"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenTemp}}", "type": "string" }] },
+            "url": "{{baseUrl}}/users"
+          }
+        },
+        {
+          "name": "Admin searches the temporary user -> email and reviewsCount",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 200', () => pm.response.to.have.status(200));",
+            "const body = pm.response.json();",
+            "pm.test('total is 1', () => pm.expect(body.total).to.eql(1));",
+            "const user = body.data[0];",
+            "pm.test('email is visible to the admin', () => pm.expect(user.email).to.eql(pm.variables.get('tempEmail')));",
+            "pm.test('reviewsCount is 1', () => pm.expect(user.reviewsCount).to.eql(1));",
+            "pm.test('no passwordHash', () => pm.expect(user).to.not.have.property('passwordHash'));"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenAdmin}}", "type": "string" }] },
+            "url": "{{baseUrl}}/users?q={{tempUsername}}"
+          }
+        },
+        {
+          "name": "Admin filters type=admin -> only admins",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 200', () => pm.response.to.have.status(200));",
+            "const body = pm.response.json();",
+            "pm.test('at least one admin', () => pm.expect(body.total).to.be.at.least(1));",
+            "pm.test('every user is an admin', () => body.data.forEach((user) => pm.expect(user.type).to.eql('admin')));"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenAdmin}}", "type": "string" }] },
+            "url": "{{baseUrl}}/users?type=admin"
+          }
+        },
+        {
+          "name": "Unknown type filter -> 400",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 400', () => pm.response.to.have.status(400));"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenAdmin}}", "type": "string" }] },
+            "url": "{{baseUrl}}/users?type=boss"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Admin changes a user's type",
+      "item": [
+        {
+          "name": "Non-admin changes a type -> 403",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 403', () => pm.response.to.have.status(403));"
+          ] } }],
+          "request": {
+            "method": "PATCH",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenTemp}}", "type": "string" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"type\": \"critic\" }", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/users/{{tempId}}/type"
+          }
+        },
+        {
+          "name": "Make someone admin -> 400",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 400', () => pm.response.to.have.status(400));",
+            "pm.test('code is VALIDATION_ERROR', () => pm.expect(pm.response.json().error.code).to.eql('VALIDATION_ERROR'));"
+          ] } }],
+          "request": {
+            "method": "PATCH",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenAdmin}}", "type": "string" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"type\": \"admin\" }", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/users/{{tempId}}/type"
+          }
+        },
+        {
+          "name": "Change an admin -> 403",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 403', () => pm.response.to.have.status(403));",
+            "pm.test('code is FORBIDDEN', () => pm.expect(pm.response.json().error.code).to.eql('FORBIDDEN'));"
+          ] } }],
+          "request": {
+            "method": "PATCH",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenAdmin}}", "type": "string" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"type\": \"normal\" }", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/users/{{adminId}}/type"
+          }
+        },
+        {
+          "name": "Unknown user -> 404",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 404', () => pm.response.to.have.status(404));"
+          ] } }],
+          "request": {
+            "method": "PATCH",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenAdmin}}", "type": "string" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"type\": \"critic\" }", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/users/000000000000000000000000/type"
+          }
+        },
+        {
+          "name": "Admin makes the temporary user critic -> 200",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 200', () => pm.response.to.have.status(200));",
+            "pm.test('type is critic', () => pm.expect(pm.response.json().user.type).to.eql('critic'));"
+          ] } }],
+          "request": {
+            "method": "PATCH",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenAdmin}}", "type": "string" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"type\": \"critic\" }", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/users/{{tempId}}/type"
+          }
+        },
+        {
+          "name": "Averages moved: critics 60, audience null",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 200', () => pm.response.to.have.status(200));",
+            "const program = pm.response.json().program;",
+            "pm.test('pointsMeanCritics is 60', () => pm.expect(program.pointsMeanCritics).to.eql(60));",
+            "pm.test('pointsMeanNormal is null', () => pm.expect(program.pointsMeanNormal).to.eql(null));"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenAdmin}}", "type": "string" }] },
+            "url": "{{baseUrl}}/programs/{{programId}}"
+          }
+        },
+        {
+          "name": "Admin makes the temporary user normal again -> 200",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 200', () => pm.response.to.have.status(200));",
+            "pm.test('type is normal', () => pm.expect(pm.response.json().user.type).to.eql('normal'));"
+          ] } }],
+          "request": {
+            "method": "PATCH",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenAdmin}}", "type": "string" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"type\": \"normal\" }", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/users/{{tempId}}/type"
+          }
+        },
+        {
+          "name": "Averages moved back: audience 60, critics null",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 200', () => pm.response.to.have.status(200));",
+            "const program = pm.response.json().program;",
+            "pm.test('pointsMeanNormal is 60', () => pm.expect(program.pointsMeanNormal).to.eql(60));",
+            "pm.test('pointsMeanCritics is null', () => pm.expect(program.pointsMeanCritics).to.eql(null));"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenAdmin}}", "type": "string" }] },
+            "url": "{{baseUrl}}/programs/{{programId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Delete own account (cascade, cleans up)",
+      "item": [
+        {
+          "name": "No session -> 401",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 401', () => pm.response.to.have.status(401));"
+          ] } }],
+          "request": {
+            "method": "DELETE",
+            "auth": { "type": "noauth" },
+            "url": "{{baseUrl}}/users/me"
+          }
+        },
+        {
+          "name": "Temporary user deletes own account -> 204",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 204', () => pm.response.to.have.status(204));",
+            "pm.test('no body', () => pm.expect(pm.response.text()).to.eql(''));"
+          ] } }],
+          "request": {
+            "method": "DELETE",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenTemp}}", "type": "string" }] },
+            "url": "{{baseUrl}}/users/me"
+          }
+        },
+        {
+          "name": "Old token stops working -> 401",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 401', () => pm.response.to.have.status(401));"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenTemp}}", "type": "string" }] },
+            "url": "{{baseUrl}}/auth/me"
+          }
+        },
+        {
+          "name": "Login with the deleted account -> 401",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 401', () => pm.response.to.have.status(401));"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "auth": { "type": "noauth" },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"login\": \"{{tempUsername}}\", \"password\": \"{{tempPassword}}\" }", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        {
+          "name": "Profile of the deleted user -> 404",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 404', () => pm.response.to.have.status(404));"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenAdmin}}", "type": "string" }] },
+            "url": "{{baseUrl}}/users/{{tempId}}"
+          }
+        },
+        {
+          "name": "The review is gone too",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 200', () => pm.response.to.have.status(200));",
+            "pm.test('the movie has no reviews', () => pm.expect(pm.response.json().total).to.eql(0));"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenAdmin}}", "type": "string" }] },
+            "url": "{{baseUrl}}/programs/{{programId}}/reviews"
+          }
+        },
+        {
+          "name": "Averages recalculated: both null",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 200', () => pm.response.to.have.status(200));",
+            "const program = pm.response.json().program;",
+            "pm.test('pointsMeanNormal is null', () => pm.expect(program.pointsMeanNormal).to.eql(null));",
+            "pm.test('pointsMeanCritics is null', () => pm.expect(program.pointsMeanCritics).to.eql(null));"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenAdmin}}", "type": "string" }] },
+            "url": "{{baseUrl}}/programs/{{programId}}"
+          }
+        }
+      ]
+    }
+  ]
+}
