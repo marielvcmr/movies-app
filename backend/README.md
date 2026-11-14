@@ -131,7 +131,7 @@ La API nunca filtra ni ordena directamente sobre OMDb: primero guarda los títul
 
 1. **Búsqueda** (`GET /programs?q=...`, solo en la página 1): llama a OMDb con `?s=<q>&type=<movie|series>`, descarta lo que no sea película o serie, y guarda los títulos nuevos con un *upsert* por `externalId`. La búsqueda de OMDb solo trae título, año, tipo, id y carátula, así que se guarda eso y `synopsis` queda en `null`. Los títulos que ya existen no se tocan.
 2. **Consulta local**: aplica los filtros y el orden sobre la colección `programs` y responde.
-3. **Ficha** (`GET /programs/:id`): si `synopsis` es `null` (solo tiene los datos de la búsqueda), pide el detalle a OMDb con una sola petición, `?i=<imdbId>&plot=full`. Con eso completa fecha, sinopsis, categorías, actores, y duración o temporadas.
+3. **Ficha** (`GET /programs/:id`): si todavía no se pidió el detalle (`detailFetchedAt` es `null`), pide el detalle a OMDb con una sola petición, `?i=<imdbId>&plot=full`. Con eso completa fecha, sinopsis, categorías, actores, y duración o temporadas.
 4. **Si OMDb falla** o se agotó el cupo, la API responde con lo que ya tiene guardado; no devuelve error.
 
 Peticiones a OMDb (base `https://www.omdbapi.com/`, siempre con `apikey`):

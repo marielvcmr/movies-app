@@ -3,7 +3,6 @@ import { ProgramType, ProgramSort, Genre } from '../constants/enums.js';
 import { ScoreFilter } from '../constants/queryLimits.js';
 import { paginationShape, objectIdSchema } from './common.schema.js';
 
-
 const LIST_SEPARATOR = ',';
 
 // "action,drama" → ['action', 'drama'], each one a valid Genre.
@@ -32,6 +31,6 @@ export const listProgramsQuerySchema = z
     { message: 'yearFrom must not be after yearTo', path: ['yearTo'] },
   );
 
-  export const programIdParamsSchema = z.object({
+export const programIdParamsSchema = z.object({
   id: objectIdSchema,
 });

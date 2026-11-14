@@ -15,7 +15,7 @@ const programSchema = new mongoose.Schema(
     year: { type: Number, required: true },
     releaseDate: { type: Date, default: null },
     posterUrl: { type: String, default: null },
-        // null until the full detail comes from OMDb. Then it is never fetched again (even if OMDb has no plot).
+    // null until the full detail comes from OMDb. Then it is never fetched again (even if OMDb has no plot).
     detailFetchedAt: { type: Date, default: null },
     genres: { type: [{ type: String, enum: Object.values(Genre) }], default: [] },
     actors: { type: [String], default: [] },
