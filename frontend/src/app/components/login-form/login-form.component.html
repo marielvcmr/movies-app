@@ -1,0 +1,28 @@
+<form (ngSubmit)="submit()">
+  <ion-input
+    class="sa-field"
+    name="login"
+    type="text"
+    autocomplete="username"
+    placeholder="Username or email"
+    aria-label="Username or email"
+    [(ngModel)]="login"
+  >
+    <ion-icon slot="start" name="person-outline" aria-hidden="true" />
+  </ion-input>
+
+  <ion-input
+    class="sa-field"
+    name="password"
+    type="password"
+    autocomplete="current-password"
+    placeholder="Password"
+    aria-label="Password"
+    [(ngModel)]="password"
+  >
+    <ion-icon slot="start" name="lock-closed-outline" aria-hidden="true" />
+    <ion-input-password-toggle slot="end" />
+  </ion-input>
+
+  <app-button class="submit" type="submit" icon="arrow-forward" [disabled]="!canSubmit()">Log in</app-button>
+</form>

@@ -1,0 +1,8 @@
+<ion-button expand="block" [type]="type()" [disabled]="disabled()">
+  <span class="content" [class.with-icon]="icon()">
+    <ng-content />
+    @if (icon()) {
+      <ion-icon [name]="icon()" aria-hidden="true" />
+    }
+  </span>
+</ion-button>

@@ -1,0 +1,40 @@
+:host {
+  display: block;
+}
+
+// Dark pill with the selected option in red (Log in / Sign up mockups).
+ion-segment {
+  --background: rgba(0, 0, 0, 0.5);
+  padding: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+}
+
+ion-segment-button {
+  --background: transparent;
+  --background-checked: transparent;
+  --color: #b7aeaa;
+  --color-checked: #ffffff;
+  --indicator-color: var(--ion-color-primary);
+  --indicator-height: 100%;
+  --indicator-box-shadow: none;
+  --border-radius: 10px;
+  --border-width: 0;
+  min-height: 44px;
+  margin: 0;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+// In md mode (Android and browser) the indicator box is only pinned to the
+// bottom, so it has no height of its own and "100%" above resolved to 0px.
+// Pinning it to the top too makes it as tall as the button.
+ion-segment-button::part(indicator) {
+  top: 0;
+}
+
+ion-segment-button::part(indicator-background) {
+  border-radius: 10px;
+}

@@ -21,18 +21,24 @@ Mockups interactivos: [SpoilerAlert — Mockups](https://claude.ai/artifact/NauH
 
 ---
 
-## Cómo ejecutar
+## Cómo ejecutar (Android por USB)
 
-1. Instalar dependencias: `pnpm install`.
-2. Arrancar el backend (ver [`backend/README.md`](../backend/README.md)).
-3. Poner la URL de la API en `src/environments/environment.ts` (`apiUrl`):
-   - Navegador: `http://localhost:3000/api/v1`
-   - Emulador de Android: `http://10.0.2.2:3000/api/v1`
-   - Teléfono físico: `http://<IP de la PC>:3000/api/v1`. El teléfono y la PC tienen que estar en la misma red WiFi.
-4. **En el navegador:** `pnpm start` (equivale a `ionic serve`) → `http://localhost:8100`.
-5. **En Android:** `pnpm build`, luego `npx cap sync android` y `npx cap run android`. Hace falta Android Studio.
+**Una vez:**
 
-En desarrollo la API usa `http`, así que `capacitor.config.ts` lleva `server: { androidScheme: 'http', cleartext: true }`. Sin eso, Android bloquea las peticiones.
+1. Instalar [Android Studio](https://developer.android.com/studio) (opciones por defecto, asistente *Standard*).
+2. En el teléfono: activar el modo desarrollador (tocar 7 veces *Versión del SO*), y luego **Depuración USB** e **Instalar vía USB**.
+3. Conectarlo por USB, elegir *Transferencia de archivos* y permitir la depuración USB.
+4. En `frontend/`: `pnpm install`, `ionic build`, `pnpm add @capacitor/android` y `npx cap add android`.
+
+**Cada vez que cambia el código:**
+
+```bash
+ionic build
+npx cap sync android
+npx cap run android
+```
+
+**API:** con el backend corriendo, ejecutar `adb reverse tcp:3000 tcp:3000` (de nuevo cada vez que se reconecta el teléfono). Así el teléfono llega a la API por el cable USB, con `apiUrl: 'http://localhost:3000/api/v1'` en `src/environments/environment.ts`.
 
 ---
 
@@ -49,18 +55,19 @@ Las páginas nunca usan `HttpClient` directamente: piden los datos a los servici
 
 | Carpeta (`src/app/`) | Responsabilidad                                                        |
 | -------------------- | ---------------------------------------------------------------------- |
+| *(raíz)*             | Arranque: `app.component`, `app.routes.ts` y guards (`auth.guard.ts`, `admin.guard.ts`). |
 | `pages`              | Pantallas. Una carpeta por ruta.                                       |
-| `components`         | Piezas de UI reutilizables (ver abajo).                                |
-| `api`                | Llamadas al backend, un servicio por recurso: `auth`, `users`, `programs`, `reviews`. |
-| `core`               | `AuthService`, interceptor y guards (`authGuard`, `adminGuard`).       |
-| `models`             | Interfaces de TypeScript de las respuestas de la API.                  |
-| `constants`          | Enums (copia de los del backend) y sus etiquetas para la interfaz.     |
-| `utils`              | Funciones de apoyo: estrellas, fechas, imágenes de respaldo.           |
+| `components`         | Piezas de UI (ver abajo), una carpeta por componente, sin subcarpetas. |
+| `api`                | Llamadas al backend, un servicio por recurso (`auth`, `users`, `programs`, `reviews`), y `auth.interceptor.ts`. |
+| `services`           | `AuthService`: sesión (signals) y token en Preferences.                |
+| `models`             | Interfaces de las respuestas de la API y enums (copia de los del backend). |
+| `constants`          | Etiquetas de los enums para la interfaz y límites fijos (puntaje 1–100, comentario 300). |
+| `utils`              | Funciones puras: estrellas, fechas, imágenes de respaldo.              |
 
 | Otras carpetas (`src/`) | Responsabilidad |
 | ----------------------- | --------------- |
-| `environments`          | URL de la API por entorno. |
-| `theme`                 | Colores y variables de Ionic (`variables.scss`). |
+| `environments`          | URL de la API por entorno. Ubicación que exige Angular. |
+| `theme`                 | Colores y variables de Ionic (`variables.scss`). Ubicación que exige Ionic. |
 
 ---
 
@@ -70,8 +77,7 @@ La app tiene dos módulos para todos los usuarios, **Home** y **My profile**, y 
 
 | Ruta                    | Pantalla (título en la app) | Acceso  | Contenido |
 | ----------------------- | --------------------------- | ------- | --------- |
-| `/login`                | Log in          | Público | **Primera pantalla.** Username o email y contraseña. El botón se activa cuando ambos campos tienen texto. Pestaña para pasar a *Sign up*. |
-| `/signup`               | Sign up         | Público | Username, email, contraseña y confirmación. Avisa si las contraseñas no coinciden. Crea siempre un usuario `normal`. |
+| `/login`                | Log in / Sign up | Público | **Primera pantalla.** Una sola página con el selector *Log in / Sign up* (`account-entry-selector`). **Log in:** username o email y contraseña; el botón se activa cuando ambos campos tienen texto. **Sign up:** username, email, contraseña y confirmación; avisa si las contraseñas no coinciden y crea siempre un usuario `normal`. |
 | `/tabs/home`            | Home            | Usuario | Pestañas **Movies** y **Series**. Buscador por nombre y panel de filtros: categoría, año (desde / hasta), puntaje mínimo de críticos, puntaje mínimo de audiencia y orden. Por defecto, de la más nueva a la más vieja. Películas y series usan la misma tarjeta. |
 | `/programs/:id`         | Details         | Usuario | Todos los campos del programa: carátula, título, tipo, año, fecha de estreno, duración (películas) o temporadas (series), categorías, sinopsis y actores. Los dos promedios (críticos y audiencia) con estrellas. Reseñas separadas en *Critics* / *Audience*. Botón *Write a review*. |
 | `/programs/:id/review`  | My review       | Usuario | Crear o editar la propia reseña: puntaje 1–100 con deslizador y estrellas en vivo, y comentario opcional (máx. 300). Al editar, permite borrarla. |
@@ -80,7 +86,7 @@ La app tiene dos módulos para todos los usuarios, **Home** y **My profile**, y 
 | `/tabs/profile/edit`    | Edit profile    | Usuario | Username, email y, opcionalmente, nueva contraseña con confirmación. El tipo se muestra pero no se puede cambiar. |
 | `/tabs/users`           | Users           | Admin   | Buscar usuarios por username o email, filtrar por tipo y cambiar a cada uno entre *Normal* y *Critic*. Los admins aparecen marcados y no se pueden cambiar. |
 
-- Todas las rutas, salvo `/login` y `/signup`, usan `authGuard`. Sin sesión se va al login.
+- Todas las rutas, salvo `/login`, usan `authGuard`. Sin sesión se va al login.
 - La pestaña **Users** solo aparece si `type = admin`, y la ruta está protegida con `adminGuard`.
 - Al tocar el nombre del autor de una reseña se abre su perfil público (`/users/:id`).
 - **Toda la interfaz está en inglés**, igual que los datos de OMDb. Los enums se muestran con las etiquetas de `constants` (ej. `science_fiction` → "Sci-Fi").
@@ -97,6 +103,10 @@ La app tiene dos módulos para todos los usuarios, **Home** y **My profile**, y 
 
 | Componente        | Dónde se usa | Qué muestra |
 | ----------------- | ------------ | ----------- |
+| `button`          | Toda la app  | Botón reutilizable (`<app-button>`): variantes `primary`, `outline` y `danger`, icono opcional a la derecha. |
+| `account-entry-selector` | Log in / Sign up | Selector *Log in / Sign up*; la página decide qué formulario mostrar. |
+| `login-form`      | Log in / Sign up | Username o email y contraseña. Emite los datos con `(submitted)`. |
+| `signup-form`     | Log in / Sign up | Username, email, contraseña y confirmación. Emite los datos con `(submitted)`. |
 | `program-card`    | Home         | Carátula, título, año, dos primeras categorías y los dos promedios. La misma para películas y series. |
 | `filter-sheet`    | Home         | Panel inferior con orden, categorías, años y puntajes mínimos. |
 | `score-box`       | Details      | Un promedio (críticos o audiencia) con su número, estrellas y cantidad de reseñas. |

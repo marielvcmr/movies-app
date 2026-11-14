@@ -1,0 +1,69 @@
+:host {
+  display: block;
+}
+
+ion-button {
+  --border-radius: 999px; // pill: fully rounded ends
+  --box-shadow: none;
+  --padding-start: 18px;
+  --padding-end: 18px;
+  height: 54px;
+  margin: 0;
+  font-family: var(--ion-font-family);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+// Label always centered; the optional icon sits at the right edge
+// without pushing the label off center.
+.content {
+  position: relative;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+.content.with-icon {
+  padding-inline: 28px; // keeps a long label from running under the icon
+}
+
+ion-icon {
+  position: absolute;
+  right: 0;
+  font-size: 20px;
+}
+
+// ── Variants ─────────────────────────────────
+:host(.variant-primary) ion-button {
+  --background: var(--ion-color-primary);
+  --background-activated: var(--ion-color-primary-shade);
+  --color: #ffffff;
+}
+
+:host(.variant-outline) ion-button {
+  --background: transparent;
+  --background-activated: rgba(255, 255, 255, 0.06);
+  --color: var(--ion-text-color);
+  --border-width: 1px;
+  --border-style: solid;
+  --border-color: rgba(255, 255, 255, 0.16);
+}
+
+:host(.variant-danger) ion-button {
+  --background: transparent;
+  --background-activated: rgba(255, 122, 111, 0.1);
+  --color: var(--sa-danger-text);
+  --border-width: 1px;
+  --border-style: solid;
+  --border-color: rgba(255, 122, 111, 0.5);
+}
+
+// Disabled: dark red instead of Ionic's default transparency.
+:host(.variant-primary) ion-button.button-disabled {
+  --background: #4a1714;
+  --color: #b08a86;
+  opacity: 1;
+}

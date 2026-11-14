@@ -1,0 +1,83 @@
+/*
+ * App Global CSS
+ * ----------------------------------------------------------------------------
+ * Put style rules here that you want to apply globally. These styles are for
+ * the entire app and not just one component. Additionally, this file can be
+ * used as an entry point to import other CSS/Sass files to be included in the
+ * output CSS.
+ * For more information on global stylesheets, visit the documentation:
+ * https://ionicframework.com/docs/layout/global-stylesheets
+ */
+
+/* Core CSS required for Ionic components to work properly */
+@import "@ionic/angular/css/core.css";
+
+/* Basic CSS for apps built with Ionic */
+@import "@ionic/angular/css/normalize.css";
+@import "@ionic/angular/css/structure.css";
+@import "@ionic/angular/css/typography.css";
+@import "@ionic/angular/css/display.css";
+
+/* Optional CSS utils that can be commented out */
+@import "@ionic/angular/css/padding.css";
+@import "@ionic/angular/css/float-elements.css";
+@import "@ionic/angular/css/text-alignment.css";
+@import "@ionic/angular/css/text-transformation.css";
+@import "@ionic/angular/css/flex-utils.css";
+
+/**
+ * Ionic Dark Mode
+ * -----------------------------------------------------
+ * For more info, please see:
+ * https://ionicframework.com/docs/theming/dark-mode
+ */
+
+/* SpoilerAlert is always dark, whatever the phone's setting. */
+@import "@ionic/angular/css/palettes/dark.always.css";
+
+/* ── SpoilerAlert global styles ─────────────────────────────── */
+
+/* Titles in Bebas Neue (e.g. "SpoilerAlert", "Create your profile"). */
+.font-display {
+  font-family: var(--sa-font-display);
+  font-weight: 400;
+  letter-spacing: 1px;
+  line-height: 0.95;
+}
+
+/* Text field used in every form: <ion-input class="sa-field">. */
+ion-input.sa-field {
+  --background: rgba(255, 255, 255, 0.05);
+  --color: var(--ion-text-color);
+  --placeholder-color: #8a817d;
+  --placeholder-opacity: 1;
+  --padding-start: 20px; // a bit more room because of the rounded ends
+  --padding-end: 12px;
+  --highlight-color-focused: var(--sa-accent-text);
+  --highlight-color-valid: var(--sa-accent-text);
+  --highlight-color-invalid: var(--sa-danger-text);
+  min-height: 54px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 999px; // pill, same as <app-button>
+  font-size: 15px;
+  font-weight: 500;
+  overflow: hidden;
+}
+
+ion-input.sa-field.has-focus {
+  border-color: rgba(255, 90, 77, 0.65);
+}
+
+ion-input.sa-field.sa-field-error {
+  border-color: rgba(255, 122, 111, 0.8);
+}
+
+ion-input.sa-field ion-icon[slot='start'] {
+  margin-inline-end: 12px;
+  color: var(--sa-text-muted);
+  font-size: 20px;
+}
+
+ion-input.sa-field ion-input-password-toggle {
+  color: var(--sa-text-muted);
+}
