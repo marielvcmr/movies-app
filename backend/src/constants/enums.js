@@ -36,3 +36,10 @@ export const Genre = Object.freeze({
   WESTERN: 'western',
   OTHER: 'other',
 });
+
+export const ProgramSort = Object.freeze({
+  NEWEST: 'newest',
+  OLDEST: 'oldest',
+  CRITICS: 'critics',
+  AUDIENCE: 'audience',
+});

@@ -69,6 +69,16 @@ Películas y series comparten la colección `programs`. El campo `type` funciona
 | `type`         | `UserType` | `normal` (default) \| `critic` \| `admin`. |
 | `createdAt`    | Date       | Fecha de registro. Se muestra en el perfil público. |
 
+#### Reglas de los campos
+
+Definidas en `src/constants/userLimits.js` (se comparte con el frontend, para que los formularios validen igual que la API):
+
+| Campo      | Regla |
+| ---------- | ----- |
+| `username` | 3–30 caracteres: letras, números, `.`, `-` y `_` (sin `@`, así un login nunca es username y email a la vez). Distingue mayúsculas: `Marie` y `marie` son usuarios distintos. |
+| `email`    | Email válido, hasta 254 caracteres. Se guarda en minúsculas y sin espacios. |
+| `password` | 8–72 caracteres, sin espacios (bcrypt solo usa los primeros 72 bytes). |
+
 #### Tipos de usuario
 
 | Tipo     | Cómo se obtiene | Qué puede hacer |

@@ -35,7 +35,7 @@ flowchart LR
 | `services`       | Lógica de negocio: importación desde OMDb, promedios, permisos.        |
 | `models`         | Modelos de Mongoose.                                                   |
 | `clients`        | Cliente de OMDb. Es el único lugar que llama a la API externa y traduce sus respuestas. |
-| `constants`      | Enums y mapa de géneros de OMDb. Se comparten con el frontend.         |
+| `constants`      | Enums, códigos de error, estados HTTP, reglas de campos y mapa de géneros de OMDb. Los que usa el frontend se copian tal cual. |
 | `config`, `utils` | Configuración y funciones compartidas.                                |
 | `scripts`        | `seed.js` y `seed-titles.json`: importa una lista inicial de títulos.  |
 
@@ -49,12 +49,17 @@ Base: `/api/v1`. Todas las respuestas son JSON.
 
 - **Sesión:** todas las rutas, salvo registro e inicio de sesión, piden el header `Authorization: Bearer <token>`. El token dura 7 días.
 - **Listas:** devuelven `{ data, page, limit, total }`. Por defecto `limit = 20` (máximo 50).
-- **Errores:** devuelven `{ error: { code, message, details? } }` con estos códigos:
-  - `400`: datos inválidos (zod)
-  - `401`: sin sesión
-  - `403`: sin permiso
-  - `404`: no existe
-  - `409`: duplicado (email, username o segunda reseña del mismo título)
+- **Errores:** devuelven `{ error: { code, message, details? } }`. El frontend debe usar `code` (estable), nunca `message`. Los códigos están en `src/constants/errorCodes.js`:
+
+  | HTTP  | `code`             | Cuándo | `details` |
+  | ----- | ------------------ | ------ | --------- |
+  | `400` | `VALIDATION_ERROR` | Datos inválidos (zod) | `[{ path, message }]`, uno por campo inválido |
+  | `400` | `BAD_REQUEST`      | Petición mal formada (por ejemplo, JSON inválido) | — |
+  | `401` | `UNAUTHORIZED`     | Sin sesión, token inválido o vencido, o login incorrecto | — |
+  | `403` | `FORBIDDEN`        | Sin permiso | — |
+  | `404` | `NOT_FOUND`        | No existe | — |
+  | `409` | `CONFLICT`         | Duplicado (email, username o segunda reseña del mismo título) | `{ fields: [...] }`, los campos duplicados |
+  | `500` | `INTERNAL_ERROR`   | Error inesperado del servidor | — |
 - **Acceso** (columna de las tablas):
   - **Público**: sin sesión.
   - **Usuario**: cualquier sesión (`normal`, `critic` o `admin`).
@@ -65,9 +70,11 @@ Base: `/api/v1`. Todas las respuestas son JSON.
 
 | Método | Ruta             | Acceso  | Descripción |
 | ------ | ---------------- | ------- | ----------- |
-| POST   | `/auth/register` | Público | Crea una cuenta con `type = normal`: `{ username, email, password }`. Devuelve token y usuario. |
-| POST   | `/auth/login`    | Público | `{ login, password }`, donde `login` es el username o el email. Devuelve token y usuario. |
-| GET    | `/auth/me`       | Usuario | Usuario de la sesión, con su email. |
+| POST   | `/auth/register` | Público | Crea una cuenta con `type = normal`: `{ username, email, password }`. Responde `201 { token, user }`. Si se envía `type`, se ignora. |
+| POST   | `/auth/login`    | Público | `{ login, password }`, donde `login` es el username o el email. Responde `200 { token, user }`. |
+| GET    | `/auth/me`       | Usuario | Responde `{ user }`: el usuario de la sesión, con su email. |
+
+Las reglas de `username`, `email` y `password` están en [`DESIGN.md`](docs/DESIGN.md#reglas-de-los-campos).
 
 ### Usuarios
 
@@ -164,8 +171,10 @@ La app está en inglés, así que los textos de OMDb (título, sinopsis, actores
 
 | Variable          | Ejemplo                    | Descripción |
 | ----------------- | -------------------------- | ----------- |
-| `PORT`            | `3000`                     | Puerto de la API. |
-| `MONGODB_URI`     | `mongodb+srv://...`        | Cadena de conexión de MongoDB Atlas. |
+| `PORT`            | `3000`                     | Puerto de la API. Opcional (default `3000`). |
+| `HOST`            | `127.0.0.1`                | Interfaz donde escucha la API. Opcional (default `127.0.0.1`). Usar `0.0.0.0` solo si un celular/emulador en la red debe llegar a la API. |
+| `MONGODB_URI`     | `mongodb+srv://...`        | Cadena de conexión de MongoDB Atlas, con el nombre de la base antes del `?`. |
+| `DNS_SERVERS`     | `1.1.1.1`                  | Opcional. Servidores DNS para Node, separados por coma. Solo si la conexión a Mongo falla con `querySrv ETIMEOUT`. |
 | `JWT_SECRET`      | texto largo y aleatorio    | Clave para firmar los tokens. |
 | `JWT_EXPIRES_IN`  | `7d`                       | Duración del token. |
 | `OMDB_API_KEY`    | `a1b2c3d4`                 | Clave de OMDb. |
@@ -175,11 +184,15 @@ La app está en inglés, así que los textos de OMDb (título, sinopsis, actores
 
 ## Crear el administrador
 
-La app nunca crea administradores: el admin, y los datos de usuarios de prueba, se insertan **directamente en MongoDB**.
+La app nunca crea administradores: el admin, y los datos de usuarios de prueba, se crean **directamente en MongoDB**.
 
-1. Generar el hash de la contraseña (dentro de `backend/`, con las dependencias instaladas):
+**Forma recomendada:** registrar el usuario con `POST /auth/register` (así su email, username y contraseña pasan las mismas validaciones que cualquier cuenta) y después, en MongoDB Atlas → *Collections* → `users`, editar el documento y cambiar `type` a `"admin"` (o `"critic"`), en minúsculas.
+
+**Forma manual** (sin la API levantada):
+
+1. Generar el hash de la contraseña (dentro de `backend/`, con las dependencias instaladas). Usar costo `12`, el mismo que la app:
    ```bash
-   node -e "console.log(require('bcrypt').hashSync('TuClaveSegura', 10))"
+   node -e "console.log(require('bcrypt').hashSync('TuClaveSegura', 12))"
    ```
 2. Insertar el usuario con `mongosh` (o desde MongoDB Atlas → *Collections* → `users` → *Insert document*):
    ```js
@@ -193,7 +206,7 @@ La app nunca crea administradores: el admin, y los datos de usuarios de prueba, 
    })
    ```
 
-Los usuarios de prueba se insertan igual, con `type: "normal"` o `type: "critic"`.
+Los usuarios de prueba se insertan igual, con `type: "normal"` o `type: "critic"`. Un documento insertado a mano no pasa por las validaciones de la app: el email debe ir en minúsculas, el username debe cumplir sus reglas y `type` debe ser exactamente `normal`, `critic` o `admin`.
 
 ---
 

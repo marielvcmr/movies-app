@@ -5,3 +5,11 @@ const DIACRITICS_PATTERN = /\p{Diacritic}/gu;
 export function normalizeTitle(text) {
   return text.normalize('NFD').replace(DIACRITICS_PATTERN, '').toLowerCase().trim();
 }
+
+// Characters with special meaning inside a regular expression.
+const REGEX_SPECIAL_CHARS = /[.*+?^${}()|[\]\\]/g;
+
+// Makes user text safe to use inside a RegExp: "c++" matches the literal "c++".
+export function escapeRegex(text) {
+  return text.replace(REGEX_SPECIAL_CHARS, '\\$&');
+}
