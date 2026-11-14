@@ -43,3 +43,9 @@ export const ProgramSort = Object.freeze({
   CRITICS: 'critics',
   AUDIENCE: 'audience',
 });
+
+// The two review tabs of a title (README: group=critics | group=audience).
+export const ReviewGroup = Object.freeze({
+  CRITICS: 'critics',
+  AUDIENCE: 'audience',
+});

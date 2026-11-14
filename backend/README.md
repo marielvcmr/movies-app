@@ -115,11 +115,11 @@ Parámetros de `GET /programs`:
 
 | Método | Ruta                          | Acceso  | Descripción |
 | ------ | ----------------------------- | ------- | ----------- |
-| GET    | `/programs/:id/reviews`       | Usuario | Reseñas del título, de la más reciente a la más antigua. `group=critics` (autores `critic`) o `group=audience` (autores `normal` y `admin`); `page`, `limit`. |
+| GET    | `/programs/:id/reviews`       | Usuario | Reseñas del título, de la más reciente a la más antigua, con `author: { _id, username, type }`. `group=critics` (autores `critic`) o `group=audience` (autores `normal` y `admin`); sin `group`, todas. `page`, `limit`. |
 | GET    | `/programs/:id/reviews/mine`  | Usuario | La reseña del usuario de la sesión para ese título, o `404` si no tiene. |
 | POST   | `/programs/:id/reviews`       | Usuario | Crea la reseña: `{ points, comment? }`. `points` entero 1–100; `comment` opcional, hasta 300 caracteres. Una por usuario y título (`409` si ya existe). |
 | PATCH  | `/reviews/:id`                | Dueño   | Edita `points` y/o `comment`. |
-| DELETE | `/reviews/:id`                | Dueño   | Borra la reseña. |
+| DELETE | `/reviews/:id`                | Dueño   | Borra la reseña. Responde `204` sin cuerpo. |
 
 Cada vez que se crea, edita o borra una reseña, el servicio recalcula `pointsMeanNormal` y `pointsMeanCritics` del programa (ver [`DESIGN.md`](docs/DESIGN.md#puntajes)).
 
