@@ -1,0 +1,27 @@
+:host {
+  display: block;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+// Same chips as the filter popup of Home (search-filter).
+.chip {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: transparent;
+  color: var(--sa-text-soft);
+  font: 700 13px var(--ion-font-family);
+  cursor: pointer;
+}
+
+.chip.selected {
+  border-color: var(--ion-color-primary);
+  background: rgba(219, 49, 37, 0.18);
+  color: #ffffff;
+}

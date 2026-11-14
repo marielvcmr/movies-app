@@ -1,0 +1,81 @@
+:host {
+  display: block;
+}
+
+article {
+  border-radius: 16px;
+  background: var(--sa-surface);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 12px 14px;
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 42px;
+  height: 42px;
+  flex: none;
+  border-radius: 50%;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.text {
+  flex: 1;
+  min-width: 0;
+
+  p {
+    margin: 2px 0 0;
+    color: var(--sa-text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.username {
+  color: var(--ion-text-color);
+  font-size: 14px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.email {
+  font-size: 12px;
+}
+
+.meta {
+  font-size: 11px;
+}
+
+// Inside the card the switch sits on the page background, like the mockup.
+.type {
+  margin-top: 10px;
+  --sa-segment-background: var(--ion-background-color);
+}
+
+.admin {
+  margin: 10px 0 0;
+  height: 38px;
+  border-radius: 10px;
+  background: rgba(245, 184, 61, 0.1);
+  color: var(--sa-star);
+  font-size: 12px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  ion-icon {
+    font-size: 15px;
+  }
+}

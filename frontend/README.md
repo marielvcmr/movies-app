@@ -82,9 +82,9 @@ La app tiene dos módulos para todos los usuarios, **Home** y **My profile**, y 
 | `/programs/:id`         | Details         | Usuario | Todos los campos del programa: carátula, título, tipo, año, fecha de estreno, duración (películas) o temporadas (series), categorías, sinopsis y actores. Los dos promedios (críticos y audiencia) con estrellas. Reseñas separadas en *Critics* / *Audience*. Botón *Write a review*. |
 | `/programs/:id/review`  | My review       | Usuario | Crear o editar la propia reseña: puntaje 1–100 con deslizador y estrellas en vivo, y comentario opcional (máx. 300). Al editar, permite borrarla. |
 | `/users/:id`            | Profile         | Usuario | Perfil público (`UserProfilePage`), solo datos no sensibles: username, fecha de registro, tipo, cantidad de reseñas, promedio de puntos dados y sus reseñas. Cada reseña abre Details. |
-| `/tabs/profile`         | My profile      | Usuario | `MyProfilePage`: mis datos (incluido mi email), tipo, estadísticas y mis reseñas con editar (mismo popup que Details) y borrar. Cerrar sesión y borrar cuenta. *Edit profile*: pendiente. |
-| `/tabs/profile/edit`    | Edit profile    | Usuario | *(Pendiente)* Username, email y, opcionalmente, nueva contraseña con confirmación. El tipo se muestra pero no se puede cambiar. |
-| `/tabs/users`           | Users           | Admin   | Buscar usuarios por username o email, filtrar por tipo y cambiar a cada uno entre *Normal* y *Critic*. Los admins aparecen marcados y no se pueden cambiar. |
+| `/tabs/profile`         | My profile      | Usuario | `MyProfilePage`: mis datos (incluido mi email), tipo, estadísticas y mis reseñas con editar (mismo popup que Details) y borrar. Cerrar sesión, *Edit profile* (popup) y borrar cuenta. |
+| *(popup en My profile)* | Edit profile    | Usuario | `edit-profile-sheet`, sin ruta propia: username, email y, opcionalmente, nueva contraseña con confirmación. Solo manda lo que cambió (`PATCH /users/me`). El tipo se muestra pero no se puede cambiar. |
+| `/tabs/users`           | Users           | Admin   | `UsersViewPage`. Buscar usuarios por username o email, filtrar por tipo y cambiar a cada uno entre *Normal* y *Critic*. Los admins aparecen marcados y no se pueden cambiar. |
 
 - Todas las rutas, salvo `/login`, usan `authGuard`. Sin sesión se va al login.
 - La pestaña **Users** solo aparece si `type = admin`, y la ruta está protegida con `adminGuard`.
@@ -109,7 +109,7 @@ La app tiene dos módulos para todos los usuarios, **Home** y **My profile**, y 
 | `signup-form`     | Log in / Sign up | Username, email, contraseña y confirmación. Emite los datos con `(submitted)`. |
 | `home-header`     | Home (y las otras pestañas) | Logo + título. `title` cambia el texto (por defecto "SpoilerAlert"). |
 | `program-selector` | Home        | Selector *Movies / Series*: `[(type)]`. Mismos estilos que `account-entry-selector` (`.sa-segment` en `global.scss`). |
-| `search-bar`      | Home         | Buscador por nombre: `[(query)]`, espera 350 ms después de la última tecla. |
+| `search-bar`      | Home, Users  | Buscador: `[(query)]` y `placeholder`, espera 350 ms después de la última tecla. Home busca programas por nombre; Users busca usuarios por username o email. |
 | `search-filter`   | Home         | Botón con contador + popup (hoja inferior): orden, categorías (dropdown que va añadiendo chips), rango de años y estrellas mínimas de críticos y audiencia. `[(filters)]`; solo aplica al tocar *Apply*. |
 | `active-filters`  | Home         | Debajo del buscador: un chip por filtro activo (orden, cada categoría, años, estrellas de críticos y de audiencia). La × de cada chip quita ese filtro; *Clear* vuelve a los valores por defecto. `[(filters)]`. |
 | `program-card-simple` | Home, Details, My review, perfiles | Carátula de un programa: imagen de OMDb o recuadro de color con el título; icono de película o serie según `type`. `size="large" \| "small" \| "mini"`. `[showName]="false"` quita el título del recuadro (cuando el nombre ya está escrito al lado). |
@@ -121,7 +121,7 @@ La app tiene dos módulos para todos los usuarios, **Home** y **My profile**, y 
 | `actor-list`      | Details      | Los actores, un `actor-chip` por cada uno. |
 | `actor-chip`      | Details      | Un actor: círculo con su inicial + nombre. |
 | `detail-section`  | Details      | Bloque con título (`heading`) y contenido libre entre las etiquetas: *Synopsis*, *Actors*. |
-| `user-type-selector` | Details   | Selector *Critics / Audience* de las reseñas: `[(group)]`. |
+| `user-type-selector` | Details, Users | Selector de dos opciones, genérico: recibe `[options]` y `[(value)]`. En Details muestra *Critics / Audience* y **filtra** las reseñas; dentro de `user-view-card` muestra *Normal / Critic* y **cambia el tipo** del usuario. El componente solo emite `(valueChange)`: lo que pasa después lo decide quien lo usa. |
 | `reviews-group-by-program` | Details | Las reseñas de un grupo (`review-details` × N), *Load more reviews* y mensajes de vacío / error. Cada reseña enlaza al perfil de su autor; con `myUserId`, la propia enlaza a *My profile*. Emite `(loadMore)` y `(retry)`. |
 | `review-details`  | Details | Una reseña: avatar con inicial, username, insignia *Critic*, fecha, puntaje /100, estrellas y comentario si lo hay. |
 | `my-review-sheet` | Details, My profile | Popup *Write a review* / *Edit review* (hoja inferior, como el de filtros) con `program-review-card`, `my-score-card` y `my-comment-section`. Al editar: *Delete review* y los botones *Cancel* + *Save changes*. No llama a la API: emite `(submitted)`, `(deleted)` y `(closed)`. |
@@ -131,6 +131,9 @@ La app tiene dos módulos para todos los usuarios, **Home** y **My profile**, y 
 | `my-comment-section` | Write a review | Comentario opcional con contador 0/300 y aviso de a qué promedio cuenta según `userType` (critic → Critics; normal/admin → Audience). `[(comment)]`. |
 | `star-rating`     | Details, filtros, My review, perfiles | Las 5 estrellas a partir de `points` (o directamente `stars`). |
 | `tab-bar`         | Home, My profile, Users | Pestañas inferiores; *Users* solo si `showUsers` (admin). |
+| `user-view-card`  | Users        | Un usuario: avatar con inicial, username (abre su perfil), email, *Since … · N reviews* y `user-type-selector` *Normal / Critic*. Los admins muestran *Admin · created in the database* en lugar del selector. No llama a la API: emite `(typeChange)`. |
+| `user-filter`     | Users        | Chips *All / Normal / Critics*: `[(type)]` (`null` = All). |
+| `edit-profile-sheet` | My profile | Popup *Edit profile* (hoja inferior, como el de filtros): username, email, nueva contraseña + confirmación y el tipo (solo lectura). Emite `(submitted)` solo con los campos que cambiaron, y `(closed)`. |
 | `user-type-badge` | Perfiles, Users | Insignia *Normal user* (gris), *Critic* (roja) o *Admin* (amarilla). `[showIcon]` añade el icono de insignia. |
 | `my-profile-info` | My profile   | Avatar con inicial, username, `user-type-badge`, *Member since* y el email (*Only you can see your email*). |
 | `user-profile-info` | Profile    | Lo mismo centrado y sin email: avatar, username, `user-type-badge` con icono y *Member since*. |

@@ -27,7 +27,7 @@ import { ProgramFactsComponent } from '../../components/program-facts/program-fa
 import { ReviewsGroupByProgramComponent } from '../../components/reviews-group-by-program/reviews-group-by-program.component';
 import { ScoreDetailCardComponent } from '../../components/score-detail-card/score-detail-card.component';
 import { UserTypeSelectorComponent } from '../../components/user-type-selector/user-type-selector.component';
-import { GENRE_LABELS } from '../../constants/labels';
+import { GENRE_LABELS, REVIEW_GROUP_OPTIONS } from '../../constants/labels';
 import type { Program } from '../../models/program.model';
 import type { ProgramReview, Review, ReviewGroup, ReviewInput } from '../../models/review.model';
 import { UserType } from '../../models/user.model';
@@ -87,6 +87,7 @@ export class ProgramDetailPage implements OnInit {
 
   // ── Reviews list (Critics / Audience) ──
   reviewGroup = signal<ReviewGroup>('critics');
+  readonly reviewGroupOptions = REVIEW_GROUP_OPTIONS;
   reviews = signal<ProgramReview[]>([]);
   reviewsTotal = signal(0);
   reviewsPage = signal(1);

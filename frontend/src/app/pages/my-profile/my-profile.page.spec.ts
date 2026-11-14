@@ -39,7 +39,9 @@ describe('MyProfilePage', () => {
   let page: MyProfilePage;
   let usersApi: Record<string, ReturnType<typeof vi.fn>>;
   let reviewsApi: Record<string, ReturnType<typeof vi.fn>>;
-  let auth: Record<'logout' | 'deleteAccount', ReturnType<typeof vi.fn>> & { user: WritableSignal<User | null> };
+  let auth: Record<'logout' | 'deleteAccount' | 'updateProfile', ReturnType<typeof vi.fn>> & {
+    user: WritableSignal<User | null>;
+  };
   let nav: { navigateRoot: ReturnType<typeof vi.fn> };
   const html = () => fixture.nativeElement as HTMLElement;
 
@@ -52,7 +54,12 @@ describe('MyProfilePage', () => {
       update: vi.fn(() => of({ ...REVIEW, points: 60 })),
       remove: vi.fn(() => of(undefined)),
     };
-    auth = { user: signal<User | null>(ME), logout: vi.fn(async () => {}), deleteAccount: vi.fn(async () => {}) };
+    auth = {
+      user: signal<User | null>(ME),
+      logout: vi.fn(async () => {}),
+      deleteAccount: vi.fn(async () => {}),
+      updateProfile: vi.fn(async () => {}),
+    };
     nav = { navigateRoot: vi.fn(async () => true) };
 
     await TestBed.configureTestingModule({
@@ -109,5 +116,23 @@ describe('MyProfilePage', () => {
     await page.logout();
     expect(auth.logout).toHaveBeenCalled();
     expect(nav.navigateRoot).toHaveBeenCalledWith('/login');
+  });
+
+  it('Edit profile opens the popup and saving closes it', async () => {
+    page.openEditProfile();
+    expect(page.profileSheetOpen()).toBe(true);
+
+    await page.saveProfile({ username: 'marielv.v' });
+    expect(auth.updateProfile).toHaveBeenCalledWith({ username: 'marielv.v' });
+    expect(page.profileSheetOpen()).toBe(false);
+  });
+
+  it('a failed save keeps the popup open with the error', async () => {
+    auth.updateProfile.mockRejectedValueOnce(new Error('nope'));
+    page.openEditProfile();
+
+    await page.saveProfile({ email: 'taken@example.com' });
+    expect(page.profileSheetOpen()).toBe(true);
+    expect(page.profileSheetError()).toBe('Something went wrong. Please try again.');
   });
 });

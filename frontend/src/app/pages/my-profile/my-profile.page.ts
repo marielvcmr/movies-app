@@ -2,26 +2,27 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { AlertController, IonContent, IonIcon, IonSpinner, NavController, ToastController } from '@ionic/angular';
 import type { ViewWillEnter } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { logOutOutline, trashOutline } from 'ionicons/icons';
+import { createOutline, logOutOutline, trashOutline } from 'ionicons/icons';
 import type { Observable, Subscription } from 'rxjs';
 
 import { apiErrorMessage } from '../../api/api-error';
 import { ReviewsApi } from '../../api/reviews.api';
 import { UsersApi } from '../../api/users.api';
 import { ButtonComponent } from '../../components/button/button.component';
+import { EditProfileSheetComponent } from '../../components/edit-profile-sheet/edit-profile-sheet.component';
 import { MyProfileInfoComponent } from '../../components/my-profile-info/my-profile-info.component';
 import { MyProfileProgramCardComponent } from '../../components/my-profile-program-card/my-profile-program-card.component';
 import { MyReviewSheetComponent } from '../../components/my-review-sheet/my-review-sheet.component';
 import { ProfilePointsCardComponent } from '../../components/profile-points-card/profile-points-card.component';
 import { ProfileReviewsCardComponent } from '../../components/profile-reviews-card/profile-reviews-card.component';
 import type { ReviewInput, UserReview } from '../../models/review.model';
-import type { PublicProfile } from '../../models/user.model';
+import type { ProfileChanges, PublicProfile } from '../../models/user.model';
 import { UserType } from '../../models/user.model';
 import { AuthService } from '../../services/auth.service';
 
 // My profile (/tabs/profile). Top to bottom:
 //   "My profile" + Log out, my-profile-info (with my email), the two stats
-//   (profile-reviews-card + profile-points-card), Delete account,
+//   (profile-reviews-card + profile-points-card), Edit profile (popup) + Delete account,
 //   and My reviews: one my-profile-program-card each, with edit and delete.
 // Editing opens the same my-review-sheet as Details (Cancel / Save changes).
 @Component({
@@ -33,6 +34,7 @@ import { AuthService } from '../../services/auth.service';
     IonIcon,
     IonSpinner,
     ButtonComponent,
+    EditProfileSheetComponent,
     MyProfileInfoComponent,
     MyProfileProgramCardComponent,
     MyReviewSheetComponent,
@@ -68,8 +70,13 @@ export class MyProfilePage implements ViewWillEnter {
   sheetError = signal<string | null>(null);
   userType = computed(() => this.auth.user()?.type ?? UserType.NORMAL);
 
+  // ── The Edit profile popup ──
+  profileSheetOpen = signal(false);
+  savingProfile = signal(false);
+  profileSheetError = signal<string | null>(null);
+
   constructor() {
-    addIcons({ logOutOutline, trashOutline });
+    addIcons({ logOutOutline, trashOutline, createOutline });
   }
 
   // Every time the tab is shown (Ionic keeps it cached): you may have reviewed something in Details.
@@ -145,6 +152,31 @@ export class MyProfilePage implements ViewWillEnter {
       await this.navCtrl.navigateRoot('/login');
     } catch (err) {
       await this.showToast(apiErrorMessage(err));
+    }
+  }
+
+  // ── Edit profile ──
+
+  openEditProfile(): void {
+    this.profileSheetError.set(null);
+    this.profileSheetOpen.set(true);
+  }
+
+  // PATCH /users/me with only what changed. AuthService updates user(), so my-profile-info
+  // shows the new username / email at once. Errors (e.g. "That email is already registered.")
+  // show inside the popup, which stays open.
+  async saveProfile(changes: ProfileChanges): Promise<void> {
+    if (this.savingProfile()) return;
+    this.savingProfile.set(true);
+    this.profileSheetError.set(null);
+    try {
+      await this.auth.updateProfile(changes);
+      this.profileSheetOpen.set(false);
+      await this.showToast('Profile updated.');
+    } catch (err) {
+      this.profileSheetError.set(apiErrorMessage(err));
+    } finally {
+      this.savingProfile.set(false);
     }
   }
 

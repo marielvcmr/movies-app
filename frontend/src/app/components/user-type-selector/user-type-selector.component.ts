@@ -1,30 +1,37 @@
 import { Component, input, output } from '@angular/core';
 import { IonLabel, IonSegment, IonSegmentButton } from '@ionic/angular';
 
-import { REVIEW_GROUP_LABELS } from '../../constants/labels';
-import type { ReviewGroup } from '../../models/review.model';
+import type { SelectorOption } from '../../constants/labels';
 
-const GROUPS: ReviewGroup[] = ['critics', 'audience'];
-
-// Critics / Audience switch above the reviews in Details: whose reviews to show.
-// Critics = reviews by critic users; Audience = reviews by standard users.
+// Two-option switch about user types. It only shows the options and emits the one tapped;
+// the parent decides what that means:
+//   Details → which reviews to show (filters the list):
+//     <app-user-type-selector [(value)]="reviewGroup" [options]="REVIEW_GROUP_OPTIONS" label="Reviews by" />
+//   Users (user-view-card) → the type of that user (the page saves it with the API):
+//     <app-user-type-selector [value]="user.type" [options]="ASSIGNABLE_USER_TYPE_OPTIONS"
+//                             (valueChange)="typeChange.emit($event)" />
+// <T> = the type of the values ('critics' | 'audience', 'normal' | 'critic'...). Angular takes it
+// from the options passed in, so [(value)] still checks that the parent's signal has that type.
 // Same look as program-selector (.sa-segment in global.scss).
-// Usage with two-way binding: <app-user-type-selector [(group)]="reviewGroup" />
 @Component({
   selector: 'app-user-type-selector',
   templateUrl: './user-type-selector.component.html',
   styleUrls: ['./user-type-selector.component.scss'],
   imports: [IonSegment, IonSegmentButton, IonLabel],
 })
-export class UserTypeSelectorComponent {
-  group = input.required<ReviewGroup>();
-  groupChange = output<ReviewGroup>();
+export class UserTypeSelectorComponent<T extends string> {
+  value = input.required<T>();
+  options = input.required<SelectorOption<T>[]>();
+  label = input('User type'); // read by screen readers
+  disabled = input(false);
 
-  readonly options = GROUPS.map((value) => ({ value, label: REVIEW_GROUP_LABELS[value] }));
+  valueChange = output<T>();
 
-  select(value: unknown): void {
-    if (GROUPS.includes(value as ReviewGroup) && value !== this.group()) {
-      this.groupChange.emit(value as ReviewGroup);
+  // Emits only a real option that is different from the current one.
+  select(picked: unknown): void {
+    const option = this.options().find((o) => o.value === picked);
+    if (option && option.value !== this.value()) {
+      this.valueChange.emit(option.value);
     }
   }
 }

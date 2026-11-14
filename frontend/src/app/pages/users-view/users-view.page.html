@@ -1,0 +1,39 @@
+<ion-content>
+  <main class="page">
+    <header class="top">
+      <h1 class="font-display">Users</h1>
+      <app-user-type-badge type="admin" />
+    </header>
+    <p class="subtitle">Choose who reviews as a critic. Changes update the averages of their reviewed titles.</p>
+
+    <!-- The same search bar as Home: here the page uses the text to search users. -->
+    <app-search-bar class="search" [(query)]="query" placeholder="Search by username or email" />
+    <app-user-filter class="filter" [(type)]="type" />
+
+    @if (error()) {
+    <div class="message" role="alert">
+      <p class="message-title">Couldn't load the users</p>
+      <p>{{ error() }}</p>
+      <button type="button" class="link" (click)="retry()">Try again</button>
+    </div>
+    } @else { @if (!loading() || users().length) {
+    <p class="summary">{{ summary() }}</p>
+    }
+
+    <div class="list">
+      @for (user of users(); track user._id) {
+      <app-user-view-card [user]="user" [busy]="savingId() === user._id" (typeChange)="changeType(user, $event)" />
+      }
+    </div>
+
+    @if (loading() && !users().length) {
+    <div class="loading"><ion-spinner name="crescent" aria-label="Loading users" /></div>
+    } @else if (!loading() && !users().length) {
+    <p class="message">No users match your search.</p>
+    } }
+
+    <ion-infinite-scroll [disabled]="!hasMore() || !!error()" (ionInfinite)="loadMore($event)">
+      <ion-infinite-scroll-content loadingSpinner="crescent" />
+    </ion-infinite-scroll>
+  </main>
+</ion-content>

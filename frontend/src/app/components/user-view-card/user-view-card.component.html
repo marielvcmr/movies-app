@@ -1,0 +1,27 @@
+<article>
+  <div class="identity">
+    <span class="avatar" [style.background-color]="avatar()" aria-hidden="true">{{ initial() }}</span>
+    <div class="text">
+      <a class="username" [routerLink]="['/users', user()._id]" routerDirection="forward">{{ user().username }}</a>
+      <p class="email">{{ user().email }}</p>
+      <p class="meta">{{ meta() }}</p>
+    </div>
+  </div>
+
+  @if (isAdmin()) {
+    <p class="admin">
+      <ion-icon name="shield-outline" aria-hidden="true" />
+      Admin · created in the database
+    </p>
+  } @else {
+    <!-- The same switch as Critics / Audience in Details. Here, changing it changes this user's type. -->
+    <app-user-type-selector
+      class="type"
+      [value]="assignableType()"
+      [options]="typeOptions"
+      [label]="'Type of ' + user().username"
+      [disabled]="busy()"
+      (valueChange)="typeChange.emit($event)"
+    />
+  }
+</article>

@@ -1,0 +1,115 @@
+<!-- Same sheet as search-filter and my-review-sheet: expandToScroll=false keeps the footer visible. -->
+<ion-modal
+  [isOpen]="isOpen()"
+  [initialBreakpoint]="0.92"
+  [breakpoints]="[0, 0.92]"
+  [expandToScroll]="false"
+  (willPresent)="prepare()"
+  (didDismiss)="closed.emit()"
+>
+  <ng-template>
+    <ion-header class="ion-no-border">
+      <ion-toolbar>
+        <div class="sheet-header">
+          <h2 class="font-display">Edit profile</h2>
+          <button type="button" class="close" aria-label="Close" (click)="closed.emit()">
+            <ion-icon name="close-outline" aria-hidden="true" />
+          </button>
+        </div>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content>
+      <form class="fields" (ngSubmit)="submit()">
+        <div class="field">
+          <span class="label" aria-hidden="true">Username</span>
+          <ion-input
+            class="sa-field"
+            name="username"
+            type="text"
+            autocomplete="username"
+            aria-label="Username"
+            [(ngModel)]="username"
+          >
+            <ion-icon slot="start" name="person-outline" aria-hidden="true" />
+          </ion-input>
+        </div>
+
+        <div class="field">
+          <span class="label" aria-hidden="true">Email</span>
+          <ion-input
+            class="sa-field"
+            name="email"
+            type="email"
+            autocomplete="email"
+            aria-label="Email"
+            [(ngModel)]="email"
+          >
+            <ion-icon slot="start" name="mail-outline" aria-hidden="true" />
+          </ion-input>
+        </div>
+
+        <div class="password-title">
+          <h3>Change password</h3>
+          <p>Leave these empty to keep your current password.</p>
+        </div>
+
+        <div class="field">
+          <span class="label" aria-hidden="true">New password</span>
+          <ion-input
+            class="sa-field"
+            name="password"
+            type="password"
+            autocomplete="new-password"
+            placeholder="New password"
+            aria-label="New password"
+            [(ngModel)]="password"
+          >
+            <ion-icon slot="start" name="lock-closed-outline" aria-hidden="true" />
+            <ion-input-password-toggle slot="end" />
+          </ion-input>
+        </div>
+
+        <div class="field">
+          <span class="label" aria-hidden="true">Confirm new password</span>
+          <ion-input
+            class="sa-field"
+            [class.sa-field-error]="mismatch()"
+            name="confirm"
+            type="password"
+            autocomplete="new-password"
+            placeholder="Confirm new password"
+            aria-label="Confirm new password"
+            [(ngModel)]="confirm"
+          >
+            <ion-icon slot="start" name="lock-closed-outline" aria-hidden="true" />
+            <ion-input-password-toggle slot="end" />
+          </ion-input>
+        </div>
+        @if (mismatch()) {
+          <p class="mismatch" role="alert">Passwords don't match.</p>
+        }
+
+        <div class="type-note">
+          <ion-icon name="shield-outline" aria-hidden="true" />
+          <div>
+            <p class="type">Type: {{ typeLabel() }}</p>
+            <p class="hint">Only an admin can change your type.</p>
+          </div>
+        </div>
+      </form>
+    </ion-content>
+
+    <ion-footer class="ion-no-border">
+      <div class="actions">
+        @if (error()) {
+          <p class="error" role="alert">{{ error() }}</p>
+        }
+        <div class="buttons">
+          <app-button variant="outline" [disabled]="busy()" (click)="closed.emit()">Cancel</app-button>
+          <app-button [disabled]="busy() || !canSave()" (click)="submit()">Save changes</app-button>
+        </div>
+      </div>
+    </ion-footer>
+  </ng-template>
+</ion-modal>

@@ -39,7 +39,12 @@
 
     <section class="reviews">
       <h2 class="font-display">Reviews</h2>
-      <app-user-type-selector class="selector" [(group)]="reviewGroup" />
+      <app-user-type-selector
+        class="selector"
+        [(value)]="reviewGroup"
+        [options]="reviewGroupOptions"
+        label="Reviews by"
+      />
       <app-reviews-group-by-program
         class="list"
         [group]="reviewGroup()"

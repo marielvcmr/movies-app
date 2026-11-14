@@ -24,7 +24,11 @@
     </div>
     }
 
-    <app-button class="delete-account" variant="danger" (click)="askDeleteAccount()">Delete account</app-button>
+    <!-- Edit profile opens a popup (edit-profile-sheet), like Filters and Write a review. -->
+    <div class="account-actions">
+      <app-button variant="outline" icon="create-outline" (click)="openEditProfile()">Edit profile</app-button>
+      <app-button variant="danger" icon="trash-outline" (click)="askDeleteAccount()">Delete account</app-button>
+    </div>
 
     <section class="reviews">
       <h2 class="font-display">My reviews</h2>
@@ -60,5 +64,14 @@
   (submitted)="saveReview($event)"
   (deleted)="deleteEditing()"
   (closed)="sheetOpen.set(false)"
+/>
+} @if (auth.user(); as user) {
+<app-edit-profile-sheet
+  [isOpen]="profileSheetOpen()"
+  [user]="user"
+  [busy]="savingProfile()"
+  [error]="profileSheetError()"
+  (submitted)="saveProfile($event)"
+  (closed)="profileSheetOpen.set(false)"
 />
 }
