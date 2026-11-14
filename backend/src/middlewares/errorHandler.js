@@ -1,17 +1,31 @@
+import { getDuplicateKeyFields } from '../utils/dbErrors.js';
 import { AppError } from '../utils/AppError.js';
 import { ErrorCode } from '../constants/errorCodes.js';
+import { HttpStatus } from '../constants/httpStatus.js';
+
+// Error type set by express.json() when the request body isn't valid JSON.
+const MALFORMED_JSON_ERROR_TYPE = 'entity.parse.failed';
 
 // Converts errors we know how to describe into AppErrors; returns null for anything unexpected.
 function toAppError(err) {
   if (err instanceof AppError) return err;
 
-  // Thrown by express.json() when the request body isn't valid JSON.
-  if (err.type === 'entity.parse.failed') {
-    return new AppError(400, 'Malformed JSON body');
+  if (err.type === MALFORMED_JSON_ERROR_TYPE) {
+    return new AppError(HttpStatus.BAD_REQUEST, 'Malformed JSON body');
   }
 
-  // Other client errors from Express/body-parser that are marked safe to show (e.g. 413 body too large).
-  if (err.expose && err.status >= 400 && err.status < 500) {
+  // Unique index violation (e.g. email already registered) → 409 with the colliding field names.
+  const duplicateFields = getDuplicateKeyFields(err);
+  if (duplicateFields) {
+    return new AppError(HttpStatus.CONFLICT, `Already in use: ${duplicateFields.join(', ')}`, {
+      details: { fields: duplicateFields },
+    });
+  }
+
+  // Other client errors (4xx) from Express/body-parser that are marked safe to show (e.g. 413 body too large).
+  const isClientError =
+    err.status >= HttpStatus.BAD_REQUEST && err.status < HttpStatus.INTERNAL_SERVER_ERROR;
+  if (err.expose && isClientError) {
     return new AppError(err.status, err.message);
   }
 
@@ -26,7 +40,7 @@ export function errorHandler(err, req, res, next) {
 
   if (!appError) {
     console.error(err);
-    return res.status(500).json({
+    return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
       error: { code: ErrorCode.INTERNAL_ERROR, message: 'Internal server error' },
     });
   }

@@ -1,4 +1,5 @@
 import { DEFAULT_CODE_BY_STATUS, ErrorCode } from '../constants/errorCodes.js';
+import { HttpStatus } from '../constants/httpStatus.js';
 
 // An error we throw on purpose; its status, code and message are safe to send to the client.
 export class AppError extends Error {
@@ -9,7 +10,7 @@ export class AppError extends Error {
     this.code =
       code ??
       DEFAULT_CODE_BY_STATUS[status] ??
-      (status < 500 ? ErrorCode.BAD_REQUEST : ErrorCode.INTERNAL_ERROR);
+      (status < HttpStatus.INTERNAL_SERVER_ERROR ? ErrorCode.BAD_REQUEST : ErrorCode.INTERNAL_ERROR);
     this.details = details;
   }
 }

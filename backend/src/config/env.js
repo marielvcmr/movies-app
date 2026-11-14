@@ -11,14 +11,21 @@ dotenv.config({
 const envSchema = z.object({
   PORT: z.coerce.number().int().min(1).max(65535).default(3000),
   HOST: z.string().min(1).default('127.0.0.1'),
-  /*MONGODB_URI: z
+  MONGODB_URI: z
     .string({ error: 'is required' })
-    .regex(/^mongodb(\+srv)?:\/\//, 'must start with mongodb:// or mongodb+srv://'),*/
+    .regex(/^mongodb(\+srv)?:\/\//, 'must start with mongodb:// or mongodb+srv://'),
+    // Optional comma-separated DNS servers for Node (e.g. "1.1.1.1"). Leave unset to use the system default.
+  DNS_SERVERS: z
+    .string()
+    .optional()
+    .transform((value) =>
+      value ? value.split(',').map((server) => server.trim()).filter(Boolean) : [],
+    ),
   JWT_SECRET: z
     .string({ error: 'is required' })
     .min(32, 'must be at least 32 characters'),
   JWT_EXPIRES_IN: z.string().min(1).default('7d'),
-  //OMDB_API_KEY: z.string({ error: 'is required' }).min(1, 'is required'),
+  OMDB_API_KEY: z.string({ error: 'is required' }).min(1, 'is required'),
   CORS_ORIGIN: z
     .string({ error: 'is required' })
     .min(1, 'is required')
