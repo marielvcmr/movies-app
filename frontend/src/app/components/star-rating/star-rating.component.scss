@@ -1,0 +1,18 @@
+:host {
+  display: inline-block;
+  line-height: 0;
+}
+
+.stars {
+  display: inline-flex;
+  gap: 2px;
+}
+
+ion-icon {
+  font-size: var(--star-size, 16px);
+  color: #6f6764;
+}
+
+ion-icon.on {
+  color: var(--sa-star);
+}

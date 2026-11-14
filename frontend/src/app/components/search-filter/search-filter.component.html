@@ -1,0 +1,127 @@
+<!-- The button that opens the popup. The badge says how many filters are on. -->
+<button type="button" class="filter-button" aria-label="Filters and sorting" (click)="open()">
+  <ion-icon name="options-outline" aria-hidden="true" />
+  @if (activeCount() > 0) {
+    <span class="badge">{{ activeCount() }}</span>
+  }
+</button>
+
+<ion-modal [isOpen]="isOpen()" [initialBreakpoint]="0.92" [breakpoints]="[0, 0.92]" (didDismiss)="close()">
+  <ng-template>
+    <ion-header class="ion-no-border">
+      <ion-toolbar>
+        <div class="sheet-header">
+          <h2 class="font-display">Filters</h2>
+          <button type="button" class="close" aria-label="Close filters" (click)="close()">
+            <ion-icon name="close-outline" aria-hidden="true" />
+          </button>
+        </div>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content>
+      <div class="sections">
+        <section>
+          <h3>Sort by</h3>
+          <div class="chips">
+            @for (option of sortOptions; track option.value) {
+              <button
+                type="button"
+                class="chip"
+                [class.selected]="draft().sort === option.value"
+                [attr.aria-pressed]="draft().sort === option.value"
+                (click)="setSort(option.value)"
+              >
+                {{ option.label }}
+              </button>
+            }
+          </div>
+        </section>
+
+        <section>
+          <h3>Category</h3>
+          <ion-select
+            class="genre-select"
+            interface="popover"
+            placeholder="Add a category"
+            aria-label="Add a category"
+            [value]="null"
+            (ionChange)="addGenre($event)"
+          >
+            @for (genre of availableGenres(); track genre.value) {
+              <ion-select-option [value]="genre.value">{{ genre.label }}</ion-select-option>
+            }
+          </ion-select>
+          @if (draft().genres.length) {
+            <div class="chips added">
+              @for (genre of draft().genres; track genre) {
+                <button
+                  type="button"
+                  class="chip selected"
+                  [attr.aria-label]="'Remove ' + genreLabels[genre]"
+                  (click)="removeGenre(genre)"
+                >
+                  {{ genreLabels[genre] }}
+                  <ion-icon name="close-outline" aria-hidden="true" />
+                </button>
+              }
+            </div>
+          }
+        </section>
+
+        <section>
+          <div class="section-title">
+            <h3>Year</h3>
+            <span class="value">{{ yearLabel() }}</span>
+          </div>
+          <ion-range
+            aria-label="Release year"
+            [dualKnobs]="true"
+            [min]="yearMin"
+            [max]="yearMax"
+            [step]="1"
+            [value]="yearRange()"
+            (ionChange)="onYearChange($event)"
+          />
+          <div class="range-ends">
+            <span>{{ yearMin }}</span>
+            <span>{{ yearMax }}</span>
+          </div>
+        </section>
+
+        @for (slider of starSliders; track slider.key) {
+          <section>
+            <div class="section-title">
+              <h3>
+                <ion-icon [name]="slider.icon" [attr.data-group]="slider.group" aria-hidden="true" />
+                {{ slider.label }}
+              </h3>
+              @if (draft()[slider.key] > 0) {
+                <app-star-rating [stars]="draft()[slider.key]" />
+              } @else {
+                <span class="value">Any</span>
+              }
+            </div>
+            <ion-range
+              [attr.aria-label]="slider.label"
+              [min]="0"
+              [max]="starsMax"
+              [step]="1"
+              [ticks]="true"
+              [snaps]="true"
+              [value]="draft()[slider.key]"
+              (ionChange)="onStarsChange(slider.key, $event)"
+            />
+          </section>
+        }
+      </div>
+    </ion-content>
+
+    <ion-footer class="ion-no-border">
+      <div class="actions">
+        <app-button variant="outline" (click)="reset()">Reset</app-button>
+        <app-button (click)="apply()">Apply</app-button>
+      </div>
+    </ion-footer>
+  </ng-template>
+</ion-modal>

@@ -1,0 +1,16 @@
+<app-program-card-simple class="poster" [program]="program()" size="small" />
+
+<div class="text">
+  <span class="type-badge">
+    <ion-icon [name]="typeIcon()" aria-hidden="true" />
+    {{ typeLabel() }}
+  </span>
+  <h1 class="title font-display">{{ program().title }}</h1>
+  <p class="meta">
+    {{ program().year }}
+    @if (length()) {
+      <span aria-hidden="true">·</span>
+      {{ length() }}
+    }
+  </p>
+</div>

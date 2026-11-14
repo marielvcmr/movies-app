@@ -1,0 +1,5 @@
+<span class="stars" role="img" [attr.aria-label]="label()">
+  @for (icon of icons(); track $index) {
+    <ion-icon [name]="icon" [class.on]="icon === 'star'" aria-hidden="true" />
+  }
+</span>

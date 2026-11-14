@@ -1,0 +1,105 @@
+// ── Floating back button ───────────────────────
+ion-toolbar {
+  --background: transparent;
+  --border-width: 0;
+  padding-inline: 8px;
+}
+
+ion-back-button {
+  --color: #ffffff;
+  --background: rgba(0, 0, 0, 0.45);
+  --border-radius: 14px;
+  --icon-font-size: 22px;
+  width: 44px;
+  height: 44px;
+}
+
+// ── Image at the top, fading into the page ─────
+.hero {
+  position: relative;
+  height: 250px;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgba(15, 11, 11, 0.2) 0%,
+      rgba(15, 11, 11, 0.55) 55%,
+      var(--ion-background-color) 100%
+    );
+  }
+}
+
+.hero-image {
+  position: absolute;
+  inset: -20px; // room for the blur at the edges
+  background-size: cover;
+  background-position: center;
+  filter: blur(14px);
+}
+
+// ── Content ────────────────────────────────────
+.page {
+  position: relative; // above the image
+  margin-top: -120px;
+  padding: 0 20px 24px;
+}
+
+.block {
+  margin-top: 20px;
+}
+
+.scores {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.synopsis {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.65;
+  color: #e4dcd8;
+}
+
+// ── Fixed bottom button ────────────────────────
+.footer {
+  background: var(--sa-bar);
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 14px 20px calc(14px + env(safe-area-inset-bottom));
+}
+
+// ── Loading / error ────────────────────────────
+.loading {
+  display: flex;
+  justify-content: center;
+}
+
+.message {
+  padding: 0 20px;
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--sa-text-muted);
+
+  p {
+    margin: 0;
+  }
+}
+
+.message-title {
+  font-weight: 700;
+  color: var(--ion-text-color);
+}
+
+.link {
+  margin-top: 8px;
+  padding: 8px;
+  background: transparent;
+  color: var(--sa-accent-text);
+  font: 700 14px var(--ion-font-family);
+  cursor: pointer;
+}

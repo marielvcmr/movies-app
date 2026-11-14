@@ -1,0 +1,11 @@
+<!-- Decorative: the title is always written next to the poster. -->
+<div class="poster" [style.background-color]="tone()" aria-hidden="true">
+  @if (showImage()) {
+    <img [src]="program().posterUrl" alt="" loading="lazy" (error)="imageFailed.set(true)" />
+  } @else {
+    <span class="fallback-title font-display">{{ program().title }}</span>
+  }
+  <span class="type-icon">
+    <ion-icon [name]="icon()" />
+  </span>
+</div>

@@ -107,13 +107,21 @@ La app tiene dos módulos para todos los usuarios, **Home** y **My profile**, y 
 | `account-entry-selector` | Log in / Sign up | Selector *Log in / Sign up*; la página decide qué formulario mostrar. |
 | `login-form`      | Log in / Sign up | Username o email y contraseña. Emite los datos con `(submitted)`. |
 | `signup-form`     | Log in / Sign up | Username, email, contraseña y confirmación. Emite los datos con `(submitted)`. |
-| `program-card`    | Home         | Carátula, título, año, dos primeras categorías y los dos promedios. La misma para películas y series. |
-| `filter-sheet`    | Home         | Panel inferior con orden, categorías, años y puntajes mínimos. |
-| `score-box`       | Details      | Un promedio (críticos o audiencia) con su número, estrellas y cantidad de reseñas. |
-| `star-rating`     | Details, My review, perfiles | Las 5 estrellas a partir de `points`. |
-| `review-item`     | Details, perfiles | Autor (con enlace a su perfil), insignia de crítico, fecha, puntaje, estrellas y comentario si lo hay. |
-| `user-type-badge` | Perfiles, Users | Insignia *Normal user*, *Critic* o *Admin*. |
-| `tab-bar`         | Home, My profile, Users | Pestañas inferiores; *Users* solo para admin. |
+| `home-header`     | Home (y las otras pestañas) | Logo + título. `title` cambia el texto (por defecto "SpoilerAlert"). |
+| `program-selector` | Home        | Selector *Movies / Series*: `[(type)]`. Mismos estilos que `account-entry-selector` (`.sa-segment` en `global.scss`). |
+| `search-bar`      | Home         | Buscador por nombre: `[(query)]`, espera 350 ms después de la última tecla. |
+| `search-filter`   | Home         | Botón con contador + popup (hoja inferior): orden, categorías (dropdown que va añadiendo chips), rango de años y estrellas mínimas de críticos y audiencia. `[(filters)]`; solo aplica al tocar *Apply*. |
+| `program-card-simple` | Home, Details, My review | Carátula de un programa: imagen de OMDb o recuadro de color con el título; icono de película o serie según `type`. `size="large" \| "small"`. |
+| `program-home-card` | Home       | `program-card-simple` + título, año, dos primeras categorías y los dos promedios. |
+| `program-detail-card` | Details  | `program-card-simple` pequeña + tipo, título y año · duración (película) o temporadas (serie). |
+| `score-detail-card` | Details    | Un promedio: `group="critics"` (insignia roja, `pointsMeanCritics`) o `group="audience"` (personas amarillas, `pointsMeanNormal`). Número, estrellas y cantidad de reseñas. |
+| `program-facts`   | Details      | Lista *Released* + *Duration* o *Seasons*. Omite las filas sin dato. |
+| `chip-list`       | Details      | Fila de etiquetas: categorías, o actores con `[avatars]="true"`. |
+| `detail-section`  | Details      | Bloque con título (`heading`) y contenido libre entre las etiquetas: *Synopsis*, *Actors*. |
+| `star-rating`     | Details, filtros, My review, perfiles | Las 5 estrellas a partir de `points` (o directamente `stars`). |
+| `tab-bar`         | Home, My profile, Users | Pestañas inferiores; *Users* solo si `showUsers` (admin). |
+| `review-item`     | Details, perfiles | *(Pendiente)* Autor (con enlace a su perfil), insignia de crítico, fecha, puntaje, estrellas y comentario si lo hay. |
+| `user-type-badge` | Perfiles, Users | *(Pendiente)* Insignia *Normal user*, *Critic* o *Admin*. |
 
 ---
 

@@ -1,0 +1,17 @@
+<div class="label">
+  <ion-icon [name]="icon()" aria-hidden="true" />
+  {{ label() }}
+</div>
+
+<div class="value">
+  <span class="number font-display">{{ score() }}</span>
+  @if (hasScore()) {
+    <span class="max">/100</span>
+  }
+</div>
+
+<app-star-rating [points]="points()" />
+
+@if (countText()) {
+  <p class="count">{{ countText() }}</p>
+}

@@ -1,0 +1,11 @@
+// Same layout as Ionic's own ion-tabs: content fills the space, bar at the bottom.
+:host {
+  display: flex;
+  flex-direction: column;
+}
+
+.tab-content {
+  position: relative;
+  flex: 1;
+  contain: layout size style;
+}

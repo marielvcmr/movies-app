@@ -1,4 +1,9 @@
-<ion-segment [value]="mode()" (ionChange)="select($event.detail.value)" aria-label="Log in or sign up">
+<ion-segment
+  class="sa-segment"
+  [value]="mode()"
+  (ionChange)="select($event.detail.value)"
+  aria-label="Log in or sign up"
+>
   <ion-segment-button value="login">
     <ion-label>Log in</ion-label>
   </ion-segment-button>

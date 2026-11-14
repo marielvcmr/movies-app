@@ -1,0 +1,57 @@
+<!-- Transparent header: only the back button, floating over the image. -->
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/home" text="" aria-label="Back to Home" />
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="hero" [style.background-color]="heroTone()" aria-hidden="true">
+    <div class="hero-image" [style.background-image]="heroImage()"></div>
+  </div>
+
+  @if (program(); as p) {
+  <main class="page">
+    <app-program-detail-card [program]="p" />
+
+    @if (genreLabels().length) {
+    <app-chip-list class="block" [items]="genreLabels()" />
+    }
+
+    <div class="scores block">
+      <app-score-detail-card group="critics" [points]="p.pointsMeanCritics" />
+      <app-score-detail-card group="audience" [points]="p.pointsMeanNormal" />
+    </div>
+
+    <app-program-facts class="block" [program]="p" />
+
+    <app-detail-section class="block" heading="Synopsis">
+      <p class="synopsis">{{ p.synopsis ?? 'No synopsis available yet.' }}</p>
+    </app-detail-section>
+
+    @if (p.actors.length) {
+    <app-detail-section class="block" heading="Actors">
+      <app-chip-list [items]="p.actors" [avatars]="true" />
+    </app-detail-section>
+    }
+  </main>
+  } @else if (error()) {
+  <div class="message" role="alert">
+    <p class="message-title">Couldn't load this title</p>
+    <p>{{ error() }}</p>
+    <button type="button" class="link" (click)="load()">Try again</button>
+  </div>
+  } @else {
+  <div class="loading"><ion-spinner name="crescent" aria-label="Loading" /></div>
+  }
+</ion-content>
+
+@if (program()) {
+<ion-footer class="ion-no-border">
+  <div class="footer">
+    <app-button icon="create-outline" (click)="writeReview()">Write a review</app-button>
+  </div>
+</ion-footer>
+}

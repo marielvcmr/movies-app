@@ -1,0 +1,8 @@
+@if (facts().length) {
+  <dl>
+    @for (fact of facts(); track fact.label) {
+      <dt>{{ fact.label }}</dt>
+      <dd>{{ fact.value }}</dd>
+    }
+  </dl>
+}

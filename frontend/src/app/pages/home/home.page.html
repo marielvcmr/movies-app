@@ -1,0 +1,43 @@
+<ion-content>
+  <main class="page">
+    <app-home-header />
+
+    <app-program-selector class="selector" [(type)]="type" />
+
+    <div class="search-row">
+      <app-search-bar class="search" [(query)]="query" [placeholder]="searchPlaceholder()" />
+      <app-search-filter [(filters)]="filters" />
+    </div>
+
+    @if (error()) {
+    <div class="message" role="alert">
+      <p class="message-title">Couldn't load the list</p>
+      <p>{{ error() }}</p>
+      <button type="button" class="link" (click)="retry()">Try again</button>
+    </div>
+    } @else { @if (!loading() || programs().length) {
+    <p class="summary">{{ summary() }}</p>
+    }
+
+    <div class="grid">
+      @for (program of programs(); track program._id) {
+      <a class="card-link" [routerLink]="['/programs', program._id]" routerDirection="forward">
+        <app-program-home-card [program]="program" />
+      </a>
+      }
+    </div>
+
+    @if (loading() && !programs().length) {
+    <div class="loading"><ion-spinner name="crescent" aria-label="Loading" /></div>
+    } @else if (!loading() && !programs().length) {
+    <div class="message">
+      <p class="message-title">No results</p>
+      <p>Try another name or clear the filters.</p>
+    </div>
+    } }
+
+    <ion-infinite-scroll [disabled]="!hasMore() || !!error()" (ionInfinite)="loadMore($event)">
+      <ion-infinite-scroll-content loadingSpinner="crescent" />
+    </ion-infinite-scroll>
+  </main>
+</ion-content>

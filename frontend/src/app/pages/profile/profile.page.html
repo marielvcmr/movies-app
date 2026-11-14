@@ -1,0 +1,17 @@
+<ion-content>
+  <main class="page">
+    <app-home-header title="My profile" />
+
+    @if (auth.user(); as user) {
+    <section class="card">
+      <p class="username">{{ user.username }}</p>
+      <p class="detail">{{ user.email }}</p>
+      <p class="detail type">{{ user.type }}</p>
+    </section>
+    }
+
+    <p class="soon">The full profile is coming soon.</p>
+
+    <app-button class="logout" variant="outline" (click)="logout()">Log out</app-button>
+  </main>
+</ion-content>
