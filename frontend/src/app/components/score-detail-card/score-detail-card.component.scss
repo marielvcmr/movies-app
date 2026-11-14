@@ -1,0 +1,54 @@
+:host {
+  display: block;
+  padding: 14px;
+  border-radius: 16px;
+  background: var(--sa-surface);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+
+  // Icon color per group (the host gets the class "critics" or "audience").
+  --group-color: var(--sa-accent-text);
+}
+
+:host(.audience) {
+  --group-color: var(--sa-star);
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sa-text-muted);
+
+  ion-icon {
+    font-size: 16px;
+    color: var(--group-color);
+  }
+}
+
+.value {
+  margin: 6px 0 4px;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.number {
+  font-size: 44px;
+  line-height: 1;
+}
+
+.max {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--sa-text-muted);
+}
+
+.count {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--sa-text-muted);
+}

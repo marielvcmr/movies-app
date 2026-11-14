@@ -1,0 +1,5 @@
+<!-- The tab pages (children of /tabs in app.routes.ts) load here. No animation between tabs. -->
+<div class="tab-content">
+  <ion-router-outlet [animated]="false" />
+</div>
+<app-tab-bar [showUsers]="auth.isAdmin()" />

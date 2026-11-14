@@ -1,0 +1,96 @@
+// Background photo at the top, fading into the page color.
+.hero {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 430px;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgba(15, 11, 11, 0.25) 0%,
+      rgba(15, 11, 11, 0.7) 55%,
+      var(--ion-background-color) 100%
+    );
+  }
+}
+
+.content {
+  position: relative; // above the photo
+  display: flex;
+  flex-direction: column;
+  padding: 176px 24px 32px;
+  transition: padding-top 0.2s ease;
+}
+
+// Sign up has more fields, so its content starts higher.
+.content.signup {
+  padding-top: 112px;
+}
+
+.logo {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+}
+
+.title {
+  margin: 22px 0 0;
+  font-size: 58px;
+}
+
+.signup .title {
+  font-size: 50px;
+}
+
+.subtitle {
+  margin: 10px 0 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--sa-text-soft);
+}
+
+.selector {
+  margin-top: 26px;
+}
+
+.form {
+  margin-top: 22px;
+}
+
+// API error (wrong password, username taken, server off...).
+.error {
+  margin: 14px 0 0;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--sa-danger-text);
+}
+
+.switch {
+  margin: 22px 0 0;
+  text-align: center;
+  font-size: 13px;
+  color: #b7aeaa;
+
+  button {
+    padding: 8px 2px;
+    background: transparent;
+    color: var(--sa-accent-text);
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+  }
+}

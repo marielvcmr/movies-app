@@ -1,0 +1,205 @@
+:host {
+  display: block;
+}
+
+// ── Button ─────────────────────────────────────
+.filter-button {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: var(--sa-surface);
+  color: var(--ion-text-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  ion-icon {
+    font-size: 22px;
+  }
+}
+
+.badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 10px;
+  background: var(--ion-color-primary);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// ── Popup (bottom sheet) ───────────────────────
+ion-modal {
+  --background: #171111;
+  --border-radius: 24px;
+  --handle-background: rgba(255, 255, 255, 0.25);
+}
+
+ion-toolbar {
+  --background: #171111;
+  --border-width: 0;
+}
+
+ion-content {
+  --background: #171111;
+}
+
+ion-footer {
+  background: #171111;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px 0;
+
+  h2 {
+    margin: 0;
+    font-size: 30px;
+  }
+}
+
+.close {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--ion-text-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  ion-icon {
+    font-size: 22px;
+  }
+}
+
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 8px 20px 24px;
+}
+
+h3 {
+  margin: 0 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sa-text-muted);
+
+  ion-icon {
+    font-size: 16px;
+  }
+
+  ion-icon[data-group='critics'] {
+    color: var(--sa-accent-text);
+  }
+
+  ion-icon[data-group='audience'] {
+    color: var(--sa-star);
+  }
+}
+
+.section-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+
+  .value {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--ion-text-color);
+  }
+}
+
+// ── Chips (sort options and added categories) ─
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chips.added {
+  margin-top: 12px;
+}
+
+.chip {
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 19px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: transparent;
+  color: var(--sa-text-soft);
+  font: 700 13px var(--ion-font-family);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+
+  ion-icon {
+    font-size: 16px;
+  }
+}
+
+.chip.selected {
+  border-color: var(--ion-color-primary);
+  background: rgba(219, 49, 37, 0.18);
+  color: #ffffff;
+}
+
+// ── Category dropdown ──────────────────────────
+.genre-select {
+  --placeholder-color: #8a817d;
+  --placeholder-opacity: 1;
+  min-height: 48px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: #1f1818;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+// ── Sliders ────────────────────────────────────
+ion-range {
+  --bar-background: rgba(255, 255, 255, 0.14);
+  --bar-background-active: var(--ion-color-primary);
+  --knob-background: #ffffff;
+  --knob-size: 22px;
+  --bar-height: 4px;
+  padding: 0 4px;
+}
+
+.range-ends {
+  display: flex;
+  justify-content: space-between;
+  margin-top: -6px;
+  font-size: 12px;
+  color: var(--sa-text-muted);
+}
+
+// ── Reset / Apply ──────────────────────────────
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 10px;
+  padding: 12px 20px calc(16px + env(safe-area-inset-bottom));
+}

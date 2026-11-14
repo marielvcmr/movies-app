@@ -1,0 +1,14 @@
+<nav aria-label="Main">
+  @for (tab of tabs(); track tab.path) {
+    <a
+      class="tab"
+      [routerLink]="tab.path"
+      routerDirection="root"
+      routerLinkActive="active"
+      ariaCurrentWhenActive="page"
+    >
+      <ion-icon [name]="tab.icon" aria-hidden="true" />
+      <span>{{ tab.label }}</span>
+    </a>
+  }
+</nav>

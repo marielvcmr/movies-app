@@ -1,0 +1,24 @@
+:host {
+  display: block;
+}
+
+ion-searchbar {
+  --background: var(--sa-surface);
+  --color: var(--ion-text-color);
+  --placeholder-color: #8a817d;
+  --placeholder-opacity: 1;
+  --icon-color: var(--sa-text-muted);
+  --clear-button-color: var(--sa-text-muted);
+  --border-radius: 14px;
+  --box-shadow: none;
+  padding: 0;
+  min-height: 48px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+ion-searchbar.searchbar-has-focus {
+  border-color: rgba(255, 90, 77, 0.65);
+}

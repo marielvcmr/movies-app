@@ -1,0 +1,10 @@
+<ul>
+  @for (item of items(); track $index) {
+    <li class="chip">
+      @if (avatars()) {
+        <span class="initial" aria-hidden="true">{{ item.charAt(0) }}</span>
+      }
+      {{ item }}
+    </li>
+  }
+</ul>

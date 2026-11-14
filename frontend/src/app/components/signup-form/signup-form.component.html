@@ -1,0 +1,61 @@
+<form (ngSubmit)="submit()">
+  <ion-input
+    class="sa-field"
+    name="username"
+    type="text"
+    autocomplete="username"
+    placeholder="Username"
+    aria-label="Username"
+    [(ngModel)]="username"
+  >
+    <ion-icon slot="start" name="person-outline" aria-hidden="true" />
+  </ion-input>
+
+  <ion-input
+    class="sa-field"
+    name="email"
+    type="email"
+    inputmode="email"
+    autocomplete="email"
+    placeholder="Email"
+    aria-label="Email"
+    [(ngModel)]="email"
+  >
+    <ion-icon slot="start" name="mail-outline" aria-hidden="true" />
+  </ion-input>
+
+  <ion-input
+    class="sa-field"
+    name="password"
+    type="password"
+    autocomplete="new-password"
+    placeholder="Password"
+    aria-label="Password"
+    [(ngModel)]="password"
+  >
+    <ion-icon slot="start" name="lock-closed-outline" aria-hidden="true" />
+    <ion-input-password-toggle slot="end" />
+  </ion-input>
+
+  <ion-input
+    class="sa-field"
+    [class.sa-field-error]="mismatch()"
+    name="confirm"
+    type="password"
+    autocomplete="new-password"
+    placeholder="Confirm password"
+    aria-label="Confirm password"
+    [(ngModel)]="confirm"
+  >
+    <ion-icon slot="start" name="lock-closed-outline" aria-hidden="true" />
+    <ion-input-password-toggle slot="end" />
+  </ion-input>
+
+  @if (mismatch()) {
+    <p class="error" role="alert">Passwords don't match.</p>
+  }
+
+  <app-button class="submit" type="submit" icon="arrow-forward" [disabled]="!canSubmit()">
+    Create my account
+  </app-button>
+</form>

@@ -1,0 +1,21 @@
+<app-program-card-simple [program]="program()" />
+
+<div class="info">
+  <h3 class="title">{{ program().title }}</h3>
+  <p class="meta">
+    {{ program().year }}
+    @if (genreText()) {
+      · {{ genreText() }}
+    }
+  </p>
+  <div class="scores">
+    <span class="score">
+      <ion-icon class="critics" [name]="icons.critics" aria-hidden="true" />
+      <span class="sr-only">Critics score</span>{{ critics() }}
+    </span>
+    <span class="score">
+      <ion-icon class="audience" [name]="icons.audience" aria-hidden="true" />
+      <span class="sr-only">Audience score</span>{{ audience() }}
+    </span>
+  </div>
+</div>

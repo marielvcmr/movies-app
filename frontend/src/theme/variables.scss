@@ -1,0 +1,29 @@
+// SpoilerAlert theme. Values come from the "Diseño" table in frontend/README.md.
+// https://ionicframework.com/docs/theming/
+
+:root {
+  // ── Ionic base colors ──────────────────────
+  --ion-background-color: #0f0b0b;
+  --ion-background-color-rgb: 15, 11, 11;
+  --ion-text-color: #f4efec;
+  --ion-text-color-rgb: 244, 239, 236;
+  --ion-font-family: 'Manrope', system-ui, sans-serif;
+
+  // Accent red: main buttons and active tab.
+  --ion-color-primary: #db3125;
+  --ion-color-primary-rgb: 219, 49, 37;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #c12b21;
+  --ion-color-primary-tint: #df463b;
+
+  // ── SpoilerAlert tokens ────────────────────
+  --sa-surface: #1a1414; // cards, fields and panels
+  --sa-bar: #140f0f; // tab bar and fixed bottom buttons
+  --sa-accent-text: #ff5a4d; // links and red text on dark backgrounds
+  --sa-danger-text: #ff7a6f; // destructive actions
+  --sa-star: #f5b83d; // stars and audience icon
+  --sa-text-soft: #cfc6c2; // secondary paragraphs
+  --sa-text-muted: #a8a09c; // labels and secondary data
+  --sa-font-display: 'Bebas Neue', Impact, sans-serif; // titles
+}

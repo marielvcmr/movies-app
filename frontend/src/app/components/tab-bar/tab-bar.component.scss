@@ -1,0 +1,36 @@
+:host {
+  display: block;
+  background: var(--sa-bar);
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+nav {
+  height: 68px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.tab {
+  width: 90px;
+  height: 52px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: var(--sa-text-muted);
+  text-decoration: none;
+  font-size: 11px;
+  font-weight: 700;
+
+  ion-icon {
+    font-size: 22px;
+  }
+}
+
+.tab.active {
+  color: var(--sa-accent-text);
+  font-weight: 800;
+}

@@ -1,0 +1,29 @@
+<ion-content [fullscreen]="true">
+  <div class="hero" aria-hidden="true">
+    <img src="assets/images/backgrounds/auth-page-background.jpg" alt="" />
+  </div>
+
+  <main class="content" [class.signup]="!isLogin()">
+    <img class="logo" src="assets/images/logos/spoiler-alert-sec-logo.png" alt="SpoilerAlert logo" />
+    <h1 class="title font-display">{{ title() }}</h1>
+    <p class="subtitle">{{ subtitle() }}</p>
+
+    <app-account-entry-selector class="selector" [(mode)]="mode" />
+
+    @if (isLogin()) {
+    <app-login-form class="form" (submitted)="onLogin($event)" />
+    } @else {
+    <app-signup-form class="form" (submitted)="onSignup($event)" />
+    } @if (errorMessage()) {
+    <p class="error" role="alert">{{ errorMessage() }}</p>
+    }
+
+    <p class="switch">
+      @if (isLogin()) { Don't have an account?
+      <button type="button" (click)="mode.set('signup')">Sign up</button>
+      } @else { Already have an account?
+      <button type="button" (click)="mode.set('login')">Log in</button>
+      }
+    </p>
+  </main>
+</ion-content>

@@ -1,0 +1,71 @@
+:host {
+  display: block;
+}
+
+.poster {
+  position: relative;
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-sizing: border-box;
+}
+
+img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.fallback-title {
+  position: relative;
+  font-size: 26px;
+  color: rgba(255, 255, 255, 0.88);
+  overflow-wrap: anywhere;
+}
+
+// Round dark backdrop so the icon is visible on top of any image.
+.type-icon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 30px;
+  height: 30px;
+  border-radius: 15px;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  ion-icon {
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.85);
+  }
+}
+
+// ── size="small" (Details header, My review) ──
+:host(.size-small) {
+  .poster {
+    padding: 10px;
+    border-radius: 14px;
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+
+  .fallback-title {
+    font-size: 22px;
+  }
+
+  .type-icon {
+    width: 26px;
+    height: 26px;
+
+    ion-icon {
+      font-size: 16px;
+    }
+  }
+}
