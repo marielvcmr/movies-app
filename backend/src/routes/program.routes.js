@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { authenticate } from '../middlewares/authenticate.js';
 import { validate, RequestPart } from '../middlewares/validate.js';
 import { listProgramsQuerySchema, programIdParamsSchema } from '../schemas/program.schema.js';
-import { createReviewSchema } from '../schemas/review.schema.js';
+import { createReviewSchema, listReviewsQuerySchema } from '../schemas/review.schema.js';
 import * as programController from '../controllers/program.controller.js';
 import * as reviewController from '../controllers/review.controller.js';
 
@@ -14,6 +14,8 @@ router.get('/:id', authenticate, validate(programIdParamsSchema, RequestPart.PAR
 
 // Reviews of a program.
 router.post('/:id/reviews', authenticate, validate(programIdParamsSchema, RequestPart.PARAMS), validate(createReviewSchema), reviewController.createReview,);
+
+router.get('/:id/reviews', authenticate, validate(programIdParamsSchema, RequestPart.PARAMS), validate(listReviewsQuerySchema, RequestPart.QUERY), reviewController.listProgramReviews);
 
 router.get('/:id/reviews/mine', authenticate, validate(programIdParamsSchema, RequestPart.PARAMS), reviewController.getMyReview,);
 

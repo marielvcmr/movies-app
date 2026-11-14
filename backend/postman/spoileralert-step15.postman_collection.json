@@ -1,0 +1,647 @@
+{
+  "info": {
+    "name": "SpoilerAlert - Step 15 (reviews and averages)",
+    "description": "Runs in order. Checks score recalculation, the review list (group filter, pagination) and owner-only edit/delete.\n\nBEFORE YOU RUN:\n1. The API runs (pnpm dev).\n2. In Atlas, critic_test has type \"critic\" and admin_test has type \"admin\".\n3. Set the CURRENT VALUE of the login and password variables of this collection (never the INITIAL VALUE: it is saved in the file).\n\nThe collection picks the newest stored movie, removes old reviews of the three users on it, and leaves it clean at the end.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000/api/v1" },
+    { "key": "normalLogin", "value": "" },
+    { "key": "normalPassword", "value": "" },
+    { "key": "criticLogin", "value": "critic_test" },
+    { "key": "criticPassword", "value": "" },
+    { "key": "adminLogin", "value": "admin_test" },
+    { "key": "adminPassword", "value": "" },
+    { "key": "tokenNormal", "value": "" },
+    { "key": "tokenCritic", "value": "" },
+    { "key": "tokenAdmin", "value": "" },
+    { "key": "userIdNormal", "value": "" },
+    { "key": "programId", "value": "" },
+    { "key": "reviewNormalId", "value": "" },
+    { "key": "reviewCriticId", "value": "" },
+    { "key": "reviewAdminId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "0. Setup",
+      "item": [
+        {
+          "name": "Log in: normal user",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('login works (check normalLogin / normalPassword and that pnpm dev runs)', () => pm.response.to.have.status(200));",
+            "if (pm.response.code !== 200) {",
+            "  pm.execution.setNextRequest(null);",
+            "} else {",
+            "  const body = pm.response.json();",
+            "  pm.collectionVariables.set('tokenNormal', body.token);",
+            "  pm.collectionVariables.set('userIdNormal', body.user._id);",
+            "  pm.test('user type is normal', () => pm.expect(body.user.type).to.eql('normal'));",
+            "}"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "auth": { "type": "noauth" },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"login\": \"{{normalLogin}}\", \"password\": \"{{normalPassword}}\" }", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        {
+          "name": "Log in: critic user",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('login works (check criticLogin / criticPassword)', () => pm.response.to.have.status(200));",
+            "const isCritic = pm.response.code === 200 && pm.response.json().user.type === 'critic';",
+            "pm.test('user type is critic (set it in Atlas if this fails)', () => pm.expect(isCritic).to.eql(true));",
+            "if (isCritic) {",
+            "  pm.collectionVariables.set('tokenCritic', pm.response.json().token);",
+            "} else {",
+            "  pm.execution.setNextRequest(null);",
+            "}"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "auth": { "type": "noauth" },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"login\": \"{{criticLogin}}\", \"password\": \"{{criticPassword}}\" }", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        {
+          "name": "Log in: admin user",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('login works (check adminLogin / adminPassword)', () => pm.response.to.have.status(200));",
+            "const isAdmin = pm.response.code === 200 && pm.response.json().user.type === 'admin';",
+            "pm.test('user type is admin (set it in Atlas if this fails)', () => pm.expect(isAdmin).to.eql(true));",
+            "if (isAdmin) {",
+            "  pm.collectionVariables.set('tokenAdmin', pm.response.json().token);",
+            "} else {",
+            "  pm.execution.setNextRequest(null);",
+            "}"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "auth": { "type": "noauth" },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"login\": \"{{adminLogin}}\", \"password\": \"{{adminPassword}}\" }", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        {
+          "name": "Pick the newest stored movie",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 200', () => pm.response.to.have.status(200));",
+            "const data = pm.response.code === 200 ? pm.response.json().data : [];",
+            "pm.test('at least one movie is stored (search one with ?q= first if this fails)', () => pm.expect(data.length).to.eql(1));",
+            "if (data.length === 1) {",
+            "  pm.collectionVariables.set('programId', data[0]._id);",
+            "} else {",
+            "  pm.execution.setNextRequest(null);",
+            "}"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenNormal}}", "type": "string" }] },
+            "url": "{{baseUrl}}/programs?type=movie&limit=1"
+          }
+        },
+        {
+          "name": "Remove old review: normal user",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 200 or 404', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));",
+            "if (pm.response.code === 200) {",
+            "  pm.sendRequest({",
+            "    url: pm.variables.get('baseUrl') + '/reviews/' + pm.response.json().review._id,",
+            "    method: 'DELETE',",
+            "    header: [{ key: 'Authorization', value: 'Bearer ' + pm.variables.get('tokenNormal') }]",
+            "  }, (err, res) => pm.test('old review deleted', () => pm.expect(res.code).to.eql(204)));",
+            "}"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenNormal}}", "type": "string" }] },
+            "url": "{{baseUrl}}/programs/{{programId}}/reviews/mine"
+          }
+        },
+        {
+          "name": "Remove old review: critic user",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 200 or 404', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));",
+            "if (pm.response.code === 200) {",
+            "  pm.sendRequest({",
+            "    url: pm.variables.get('baseUrl') + '/reviews/' + pm.response.json().review._id,",
+            "    method: 'DELETE',",
+            "    header: [{ key: 'Authorization', value: 'Bearer ' + pm.variables.get('tokenCritic') }]",
+            "  }, (err, res) => pm.test('old review deleted', () => pm.expect(res.code).to.eql(204)));",
+            "}"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenCritic}}", "type": "string" }] },
+            "url": "{{baseUrl}}/programs/{{programId}}/reviews/mine"
+          }
+        },
+        {
+          "name": "Remove old review: admin user",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 200 or 404', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));",
+            "if (pm.response.code === 200) {",
+            "  pm.sendRequest({",
+            "    url: pm.variables.get('baseUrl') + '/reviews/' + pm.response.json().review._id,",
+            "    method: 'DELETE',",
+            "    header: [{ key: 'Authorization', value: 'Bearer ' + pm.variables.get('tokenAdmin') }]",
+            "  }, (err, res) => pm.test('old review deleted', () => pm.expect(res.code).to.eql(204)));",
+            "}"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenAdmin}}", "type": "string" }] },
+            "url": "{{baseUrl}}/programs/{{programId}}/reviews/mine"
+          }
+        },
+        {
+          "name": "Check: the movie has no reviews now",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 200', () => pm.response.to.have.status(200));",
+            "pm.test('no reviews from other users (delete them in Atlas if this fails)', () => pm.expect(pm.response.json().total).to.eql(0));"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenNormal}}", "type": "string" }] },
+            "url": "{{baseUrl}}/programs/{{programId}}/reviews"
+          }
+        }
+      ]
+    },
+    {
+      "name": "1. Create reviews and averages",
+      "item": [
+        {
+          "name": "Normal user creates a review (85) -> 201",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 201', () => pm.response.to.have.status(201));",
+            "const review = pm.response.json().review;",
+            "pm.collectionVariables.set('reviewNormalId', review._id);",
+            "pm.test('points is 85', () => pm.expect(review.points).to.eql(85));",
+            "pm.test('comment has no outer spaces', () => pm.expect(review.comment).to.eql('Great movie'));",
+            "pm.test('author is the logged-in user', () => pm.expect(review.author).to.eql(pm.variables.get('userIdNormal')));"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenNormal}}", "type": "string" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"points\": 85, \"comment\": \"  Great movie  \" }", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/programs/{{programId}}/reviews"
+          }
+        },
+        {
+          "name": "Averages: audience 85, critics null",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 200', () => pm.response.to.have.status(200));",
+            "const program = pm.response.json().program;",
+            "pm.test('pointsMeanNormal is 85', () => pm.expect(program.pointsMeanNormal).to.eql(85));",
+            "pm.test('pointsMeanCritics is null', () => pm.expect(program.pointsMeanCritics).to.eql(null));"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenNormal}}", "type": "string" }] },
+            "url": "{{baseUrl}}/programs/{{programId}}"
+          }
+        },
+        {
+          "name": "Critic creates a review (40), no comment -> 201",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 201', () => pm.response.to.have.status(201));",
+            "const review = pm.response.json().review;",
+            "pm.collectionVariables.set('reviewCriticId', review._id);",
+            "pm.test('comment is null', () => pm.expect(review.comment).to.eql(null));"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenCritic}}", "type": "string" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"points\": 40 }", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/programs/{{programId}}/reviews"
+          }
+        },
+        {
+          "name": "Averages: audience 85, critics 40",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 200', () => pm.response.to.have.status(200));",
+            "const program = pm.response.json().program;",
+            "pm.test('pointsMeanNormal is 85', () => pm.expect(program.pointsMeanNormal).to.eql(85));",
+            "pm.test('pointsMeanCritics is 40', () => pm.expect(program.pointsMeanCritics).to.eql(40));"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenNormal}}", "type": "string" }] },
+            "url": "{{baseUrl}}/programs/{{programId}}"
+          }
+        },
+        {
+          "name": "Admin creates a review (70) -> 201",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 201', () => pm.response.to.have.status(201));",
+            "pm.collectionVariables.set('reviewAdminId', pm.response.json().review._id);"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenAdmin}}", "type": "string" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"points\": 70 }", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/programs/{{programId}}/reviews"
+          }
+        },
+        {
+          "name": "Averages: admin counts as audience -> 77.5",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 200', () => pm.response.to.have.status(200));",
+            "const program = pm.response.json().program;",
+            "pm.test('pointsMeanNormal is 77.5 (85 and 70)', () => pm.expect(program.pointsMeanNormal).to.eql(77.5));",
+            "pm.test('pointsMeanCritics is still 40', () => pm.expect(program.pointsMeanCritics).to.eql(40));"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenNormal}}", "type": "string" }] },
+            "url": "{{baseUrl}}/programs/{{programId}}"
+          }
+        },
+        {
+          "name": "Second review by the same user -> 409",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 409', () => pm.response.to.have.status(409));",
+            "pm.test('code is CONFLICT', () => pm.expect(pm.response.json().error.code).to.eql('CONFLICT'));"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenNormal}}", "type": "string" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"points\": 10 }", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/programs/{{programId}}/reviews"
+          }
+        },
+        {
+          "name": "Review for a program that does not exist -> 404",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 404', () => pm.response.to.have.status(404));",
+            "pm.test('code is NOT_FOUND', () => pm.expect(pm.response.json().error.code).to.eql('NOT_FOUND'));"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenNormal}}", "type": "string" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"points\": 50 }", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/programs/000000000000000000000000/reviews"
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Edit reviews (owner only)",
+      "item": [
+        {
+          "name": "Owner changes points to 90 -> 200",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 200', () => pm.response.to.have.status(200));",
+            "const review = pm.response.json().review;",
+            "pm.test('points is 90', () => pm.expect(review.points).to.eql(90));",
+            "pm.test('comment did not change', () => pm.expect(review.comment).to.eql('Great movie'));"
+          ] } }],
+          "request": {
+            "method": "PATCH",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenNormal}}", "type": "string" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"points\": 90 }", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/reviews/{{reviewNormalId}}"
+          }
+        },
+        {
+          "name": "Averages: audience 80 (90 and 70)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 200', () => pm.response.to.have.status(200));",
+            "const program = pm.response.json().program;",
+            "pm.test('pointsMeanNormal is 80', () => pm.expect(program.pointsMeanNormal).to.eql(80));",
+            "pm.test('pointsMeanCritics is still 40', () => pm.expect(program.pointsMeanCritics).to.eql(40));"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenNormal}}", "type": "string" }] },
+            "url": "{{baseUrl}}/programs/{{programId}}"
+          }
+        },
+        {
+          "name": "Owner removes the comment -> 200",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 200', () => pm.response.to.have.status(200));",
+            "const review = pm.response.json().review;",
+            "pm.test('comment is null', () => pm.expect(review.comment).to.eql(null));",
+            "pm.test('points did not change', () => pm.expect(review.points).to.eql(90));"
+          ] } }],
+          "request": {
+            "method": "PATCH",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenNormal}}", "type": "string" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"comment\": \"\" }", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/reviews/{{reviewNormalId}}"
+          }
+        },
+        {
+          "name": "Empty body -> 400",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 400', () => pm.response.to.have.status(400));",
+            "pm.test('code is VALIDATION_ERROR', () => pm.expect(pm.response.json().error.code).to.eql('VALIDATION_ERROR'));"
+          ] } }],
+          "request": {
+            "method": "PATCH",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenNormal}}", "type": "string" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{}", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/reviews/{{reviewNormalId}}"
+          }
+        },
+        {
+          "name": "Other user edits the review -> 403",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 403', () => pm.response.to.have.status(403));",
+            "pm.test('code is FORBIDDEN', () => pm.expect(pm.response.json().error.code).to.eql('FORBIDDEN'));"
+          ] } }],
+          "request": {
+            "method": "PATCH",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenCritic}}", "type": "string" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"points\": 1 }", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/reviews/{{reviewNormalId}}"
+          }
+        },
+        {
+          "name": "Other user deletes the review -> 403",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 403', () => pm.response.to.have.status(403));",
+            "pm.test('code is FORBIDDEN', () => pm.expect(pm.response.json().error.code).to.eql('FORBIDDEN'));"
+          ] } }],
+          "request": {
+            "method": "DELETE",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenCritic}}", "type": "string" }] },
+            "url": "{{baseUrl}}/reviews/{{reviewNormalId}}"
+          }
+        },
+        {
+          "name": "Invalid review id -> 400",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 400', () => pm.response.to.have.status(400));",
+            "pm.test('code is VALIDATION_ERROR', () => pm.expect(pm.response.json().error.code).to.eql('VALIDATION_ERROR'));"
+          ] } }],
+          "request": {
+            "method": "PATCH",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenNormal}}", "type": "string" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"points\": 50 }", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/reviews/abc"
+          }
+        },
+        {
+          "name": "Unknown review id -> 404",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 404', () => pm.response.to.have.status(404));",
+            "pm.test('code is NOT_FOUND', () => pm.expect(pm.response.json().error.code).to.eql('NOT_FOUND'));"
+          ] } }],
+          "request": {
+            "method": "PATCH",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenNormal}}", "type": "string" }] },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"points\": 50 }", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/reviews/000000000000000000000000"
+          }
+        },
+        {
+          "name": "No session -> 401",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 401', () => pm.response.to.have.status(401));",
+            "pm.test('code is UNAUTHORIZED', () => pm.expect(pm.response.json().error.code).to.eql('UNAUTHORIZED'));"
+          ] } }],
+          "request": {
+            "method": "PATCH",
+            "auth": { "type": "noauth" },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"points\": 50 }", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/reviews/{{reviewNormalId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. List reviews of a program",
+      "item": [
+        {
+          "name": "All reviews -> 3, newest first, author without email",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 200', () => pm.response.to.have.status(200));",
+            "const body = pm.response.json();",
+            "pm.test('total is 3', () => pm.expect(body.total).to.eql(3));",
+            "const dates = body.data.map((review) => review.createdAt);",
+            "pm.test('newest first', () => pm.expect(dates).to.eql([...dates].sort().reverse()));",
+            "pm.test('author has only _id, username and type', () => body.data.forEach((review) => pm.expect(review.author).to.have.all.keys('_id', 'username', 'type')));"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenNormal}}", "type": "string" }] },
+            "url": "{{baseUrl}}/programs/{{programId}}/reviews"
+          }
+        },
+        {
+          "name": "group=critics -> only critic authors",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 200', () => pm.response.to.have.status(200));",
+            "const body = pm.response.json();",
+            "pm.test('total is 1', () => pm.expect(body.total).to.eql(1));",
+            "pm.test('every author is a critic', () => body.data.forEach((review) => pm.expect(review.author.type).to.eql('critic')));"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenNormal}}", "type": "string" }] },
+            "url": "{{baseUrl}}/programs/{{programId}}/reviews?group=critics"
+          }
+        },
+        {
+          "name": "group=audience -> normal and admin authors",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 200', () => pm.response.to.have.status(200));",
+            "const body = pm.response.json();",
+            "pm.test('total is 2', () => pm.expect(body.total).to.eql(2));",
+            "pm.test('every author is normal or admin', () => body.data.forEach((review) => pm.expect(review.author.type).to.be.oneOf(['normal', 'admin'])));"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenNormal}}", "type": "string" }] },
+            "url": "{{baseUrl}}/programs/{{programId}}/reviews?group=audience"
+          }
+        },
+        {
+          "name": "Unknown group -> 400",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 400', () => pm.response.to.have.status(400));",
+            "pm.test('code is VALIDATION_ERROR', () => pm.expect(pm.response.json().error.code).to.eql('VALIDATION_ERROR'));"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenNormal}}", "type": "string" }] },
+            "url": "{{baseUrl}}/programs/{{programId}}/reviews?group=fans"
+          }
+        },
+        {
+          "name": "Pagination: limit=1, page=2",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 200', () => pm.response.to.have.status(200));",
+            "const body = pm.response.json();",
+            "pm.test('one review on the page', () => pm.expect(body.data.length).to.eql(1));",
+            "pm.test('page 2, limit 1, total 3', () => pm.expect([body.page, body.limit, body.total]).to.eql([2, 1, 3]));"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenNormal}}", "type": "string" }] },
+            "url": "{{baseUrl}}/programs/{{programId}}/reviews?limit=1&page=2"
+          }
+        },
+        {
+          "name": "Program does not exist -> 404",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 404', () => pm.response.to.have.status(404));",
+            "pm.test('code is NOT_FOUND', () => pm.expect(pm.response.json().error.code).to.eql('NOT_FOUND'));"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenNormal}}", "type": "string" }] },
+            "url": "{{baseUrl}}/programs/000000000000000000000000/reviews"
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Score filter and sort",
+      "item": [
+        {
+          "name": "minAudience=80 includes the movie",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 200', () => pm.response.to.have.status(200));",
+            "const data = pm.response.json().data;",
+            "pm.test('the movie is in the results', () => pm.expect(data.map((program) => program._id)).to.include(pm.variables.get('programId')));",
+            "pm.test('every result has pointsMeanNormal >= 80', () => data.forEach((program) => pm.expect(program.pointsMeanNormal).to.be.at.least(80)));"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenNormal}}", "type": "string" }] },
+            "url": "{{baseUrl}}/programs?type=movie&minAudience=80&limit=50"
+          }
+        },
+        {
+          "name": "sort=audience: highest first, unscored last",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 200', () => pm.response.to.have.status(200));",
+            "const values = pm.response.json().data.map((program) => program.pointsMeanNormal);",
+            "const firstNull = values.indexOf(null);",
+            "const scored = firstNull === -1 ? values : values.slice(0, firstNull);",
+            "pm.test('scored titles: highest first', () => pm.expect(scored).to.eql([...scored].sort((a, b) => b - a)));",
+            "pm.test('titles without score come last', () => pm.expect(firstNull === -1 || values.slice(firstNull).every((value) => value === null)).to.eql(true));"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenNormal}}", "type": "string" }] },
+            "url": "{{baseUrl}}/programs?type=movie&sort=audience&limit=50"
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Delete reviews (cleans up the movie)",
+      "item": [
+        {
+          "name": "Admin deletes own review -> 204",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 204', () => pm.response.to.have.status(204));",
+            "pm.test('no body', () => pm.expect(pm.response.text()).to.eql(''));"
+          ] } }],
+          "request": {
+            "method": "DELETE",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenAdmin}}", "type": "string" }] },
+            "url": "{{baseUrl}}/reviews/{{reviewAdminId}}"
+          }
+        },
+        {
+          "name": "Averages: audience 90 again",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 200', () => pm.response.to.have.status(200));",
+            "const program = pm.response.json().program;",
+            "pm.test('pointsMeanNormal is 90', () => pm.expect(program.pointsMeanNormal).to.eql(90));",
+            "pm.test('pointsMeanCritics is still 40', () => pm.expect(program.pointsMeanCritics).to.eql(40));"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenNormal}}", "type": "string" }] },
+            "url": "{{baseUrl}}/programs/{{programId}}"
+          }
+        },
+        {
+          "name": "Critic deletes own review -> 204",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 204', () => pm.response.to.have.status(204));"
+          ] } }],
+          "request": {
+            "method": "DELETE",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenCritic}}", "type": "string" }] },
+            "url": "{{baseUrl}}/reviews/{{reviewCriticId}}"
+          }
+        },
+        {
+          "name": "Averages: critics back to null",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 200', () => pm.response.to.have.status(200));",
+            "const program = pm.response.json().program;",
+            "pm.test('pointsMeanNormal is 90', () => pm.expect(program.pointsMeanNormal).to.eql(90));",
+            "pm.test('pointsMeanCritics is null', () => pm.expect(program.pointsMeanCritics).to.eql(null));"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenNormal}}", "type": "string" }] },
+            "url": "{{baseUrl}}/programs/{{programId}}"
+          }
+        },
+        {
+          "name": "Normal user deletes own review -> 204",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 204', () => pm.response.to.have.status(204));"
+          ] } }],
+          "request": {
+            "method": "DELETE",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenNormal}}", "type": "string" }] },
+            "url": "{{baseUrl}}/reviews/{{reviewNormalId}}"
+          }
+        },
+        {
+          "name": "Averages: both null (movie is clean again)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 200', () => pm.response.to.have.status(200));",
+            "const program = pm.response.json().program;",
+            "pm.test('pointsMeanNormal is null', () => pm.expect(program.pointsMeanNormal).to.eql(null));",
+            "pm.test('pointsMeanCritics is null', () => pm.expect(program.pointsMeanCritics).to.eql(null));"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenNormal}}", "type": "string" }] },
+            "url": "{{baseUrl}}/programs/{{programId}}"
+          }
+        },
+        {
+          "name": "Deleted review -> 404",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('status 404', () => pm.response.to.have.status(404));",
+            "pm.test('code is NOT_FOUND', () => pm.expect(pm.response.json().error.code).to.eql('NOT_FOUND'));"
+          ] } }],
+          "request": {
+            "method": "DELETE",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{tokenNormal}}", "type": "string" }] },
+            "url": "{{baseUrl}}/reviews/{{reviewNormalId}}"
+          }
+        }
+      ]
+    }
+  ]
+}
