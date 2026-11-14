@@ -194,21 +194,6 @@ La app está en inglés, así que los textos de OMDb (título, sinopsis, actores
 
 ---
 
-## Variables de entorno
-
-| Variable          | Ejemplo                    | Descripción |
-| ----------------- | -------------------------- | ----------- |
-| `PORT`            | `3000`                     | Puerto de la API. Opcional (default `3000`). |
-| `HOST`            | `127.0.0.1`                | Interfaz donde escucha la API. Opcional (default `127.0.0.1`). Usar `0.0.0.0` solo si un celular/emulador en la red debe llegar a la API. |
-| `MONGODB_URI`     | `mongodb+srv://...`        | Cadena de conexión de MongoDB Atlas, con el nombre de la base antes del `?`. |
-| `DNS_SERVERS`     | `1.1.1.1`                  | Opcional. Servidores DNS para Node, separados por coma. Solo si la conexión a Mongo falla con `querySrv ETIMEOUT`. |
-| `JWT_SECRET`      | texto largo y aleatorio    | Clave para firmar los tokens. |
-| `JWT_EXPIRES_IN`  | `7d`                       | Duración del token. |
-| `OMDB_API_KEY`    | `a1b2c3d4`                 | Clave de OMDb. |
-| `CORS_ORIGIN`     | `http://localhost:8100,http://localhost` | Orígenes permitidos, separados por coma: `ionic serve` (`http://localhost:8100`) y la app de Android (`http://localhost`). Para la app de iOS, agregar `capacitor://localhost`. |
-| `DEMO_USER_PASSWORD` | texto de 8–72 caracteres | Opcional. Contraseña de los usuarios de prueba que crea `pnpm seed:demo`. |
-
----
 
 ## Crear el administrador
 
