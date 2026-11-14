@@ -1,0 +1,33 @@
+// Colors of the MyProfile / UserProfile mockups.
+:host {
+  height: 26px;
+  padding: 0 12px;
+  border-radius: 13px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+:host(.normal) {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--sa-text-soft);
+}
+
+:host(.critic) {
+  background: rgba(219, 49, 37, 0.2);
+  color: #ff8a80;
+}
+
+:host(.admin) {
+  background: rgba(245, 184, 61, 0.16);
+  color: var(--sa-star);
+}
+
+ion-icon {
+  font-size: 14px;
+}

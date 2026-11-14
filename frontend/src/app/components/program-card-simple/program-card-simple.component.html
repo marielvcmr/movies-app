@@ -2,7 +2,7 @@
 <div class="poster" [style.background-color]="tone()" aria-hidden="true">
   @if (showImage()) {
     <img [src]="program().posterUrl" alt="" loading="lazy" (error)="imageFailed.set(true)" />
-  } @else {
+  } @else if (showName()) {
     <span class="fallback-title font-display">{{ program().title }}</span>
   }
   <span class="type-icon">

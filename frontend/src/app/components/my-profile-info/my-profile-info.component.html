@@ -1,0 +1,16 @@
+<div class="identity">
+  <span class="avatar font-display" [style.background-color]="avatar()" aria-hidden="true">{{ initial() }}</span>
+  <div class="text">
+    <p class="username font-display">{{ user().username }}</p>
+    <app-user-type-badge class="badge" [type]="user().type" />
+    <p class="since">Member since {{ memberSince() }}</p>
+  </div>
+</div>
+
+<div class="email">
+  <ion-icon name="mail-outline" aria-hidden="true" />
+  <div class="email-text">
+    <p class="address">{{ user().email }}</p>
+    <p class="hint">Only you can see your email</p>
+  </div>
+</div>

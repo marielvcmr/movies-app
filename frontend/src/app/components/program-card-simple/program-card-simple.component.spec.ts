@@ -8,9 +8,10 @@ describe('ProgramCardSimpleComponent', () => {
   let fixture: ComponentFixture<ProgramCardSimpleComponent>;
   const html = () => fixture.nativeElement as HTMLElement;
 
-  function render(program: PosterData) {
+  function render(program: PosterData, showName = true) {
     fixture = TestBed.createComponent(ProgramCardSimpleComponent);
     fixture.componentRef.setInput('program', program);
+    fixture.componentRef.setInput('showName', showName);
     fixture.detectChanges();
   }
 
@@ -36,5 +37,11 @@ describe('ProgramCardSimpleComponent', () => {
     fixture.detectChanges();
     expect(html().querySelector('img')).toBeNull();
     expect(html().querySelector('.fallback-title')).not.toBeNull();
+  });
+
+  it('with showName false, the box without image has no title', () => {
+    render({ title: 'Dune', type: 'movie', posterUrl: null }, false);
+    expect(html().querySelector('.fallback-title')).toBeNull();
+    expect(html().querySelector('.type-icon')).not.toBeNull();
   });
 });

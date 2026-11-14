@@ -1,0 +1,108 @@
+.page {
+  padding: calc(20px + env(safe-area-inset-top)) 20px 24px;
+}
+
+// ── "My profile" + Log out ─────────────────────
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  h1 {
+    margin: 0;
+    font-size: 34px;
+  }
+}
+
+.icon-button {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: var(--sa-glass-bg); // liquid glass (theme/variables.scss)
+  border: 1px solid var(--sa-glass-border);
+  box-shadow: var(--sa-glass-shadow);
+  backdrop-filter: var(--sa-glass-blur);
+  -webkit-backdrop-filter: var(--sa-glass-blur);
+  color: var(--ion-text-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  ion-icon {
+    font-size: 20px;
+  }
+}
+
+.info {
+  margin-top: 20px;
+}
+
+.stats {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+// Edit profile + Delete account side by side, like the mockup.
+.account-actions {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+// ── My reviews ─────────────────────────────────
+.reviews {
+  margin-top: 26px;
+
+  h2 {
+    margin: 0;
+    font-size: 28px;
+  }
+}
+
+.list {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.load-more {
+  height: 46px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: transparent;
+  color: var(--ion-text-color);
+  font: 700 13px var(--ion-font-family);
+  cursor: pointer;
+}
+
+// ── Loading / empty / error ────────────────────
+.loading {
+  padding: 16px 0;
+  display: flex;
+  justify-content: center;
+}
+
+.message {
+  margin: 12px 0 0;
+  text-align: center;
+  font-size: 14px;
+  color: var(--sa-text-muted);
+
+  p {
+    margin: 0;
+  }
+}
+
+.link {
+  margin-top: 6px;
+  padding: 8px;
+  background: transparent;
+  color: var(--sa-accent-text);
+  font: 700 14px var(--ion-font-family);
+  cursor: pointer;
+}

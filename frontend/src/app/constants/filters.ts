@@ -18,3 +18,6 @@ export const DEFAULT_FILTERS: ProgramFilters = {
 
 // Results per page of GET /programs (the API allows up to 50).
 export const PROGRAMS_PAGE_SIZE = 20;
+
+// Users per page of GET /users (Users module, admins only).
+export const USERS_PAGE_SIZE = 20;

@@ -2,8 +2,11 @@
   display: block;
   padding: 14px;
   border-radius: 16px;
-  background: var(--sa-surface);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: var(--sa-glass-bg); // liquid glass (theme/variables.scss)
+  border: 1px solid var(--sa-glass-border);
+  box-shadow: var(--sa-glass-shadow);
+  backdrop-filter: var(--sa-glass-blur);
+  -webkit-backdrop-filter: var(--sa-glass-blur);
 
   // Icon color per group (the host gets the class "critics" or "audience").
   --group-color: var(--sa-accent-text);

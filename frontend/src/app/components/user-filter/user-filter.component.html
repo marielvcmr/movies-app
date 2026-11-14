@@ -1,0 +1,13 @@
+<div class="chips" role="group" aria-label="Filter by type">
+  @for (option of options; track option.label) {
+    <button
+      type="button"
+      class="chip"
+      [class.selected]="type() === option.value"
+      [attr.aria-pressed]="type() === option.value"
+      (click)="pick(option.value)"
+    >
+      {{ option.label }}
+    </button>
+  }
+</div>

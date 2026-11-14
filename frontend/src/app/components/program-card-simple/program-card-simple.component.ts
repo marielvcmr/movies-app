@@ -19,6 +19,9 @@ export type PosterSize = 'large' | 'small' | 'mini';
 // <app-program-card-simple [program]="p" />               → Home cards
 // <app-program-card-simple [program]="p" size="small" />  → Details header
 // <app-program-card-simple [program]="p" size="mini" />   → program-review-card (write a review)
+// <app-program-card-simple [program]="p" size="mini" [showName]="false" />
+//   → profile review cards: the title is already written next to the poster, so the
+//     colored box (when there's no image) shows only the type icon, not the name again.
 @Component({
   selector: 'app-program-card-simple',
   templateUrl: './program-card-simple.component.html',
@@ -29,6 +32,7 @@ export type PosterSize = 'large' | 'small' | 'mini';
 export class ProgramCardSimpleComponent {
   program = input.required<PosterData>();
   size = input<PosterSize>('large');
+  showName = input(true);
 
   // Back to false every time the poster URL changes, true if that image fails.
   imageFailed = linkedSignal({ source: () => this.program().posterUrl, computation: () => false });

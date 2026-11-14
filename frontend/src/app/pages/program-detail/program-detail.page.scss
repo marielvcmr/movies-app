@@ -7,29 +7,33 @@ ion-toolbar {
 
 ion-back-button {
   --color: #ffffff;
-  --background: rgba(0, 0, 0, 0.45);
+  --background: var(--sa-glass-bg); // liquid glass (theme/variables.scss)
   --border-radius: 14px;
   --icon-font-size: 22px;
   width: 44px;
   height: 44px;
+  border: 1px solid var(--sa-glass-border);
+  border-radius: 14px;
+  box-shadow: var(--sa-glass-shadow);
+  backdrop-filter: var(--sa-glass-blur);
+  -webkit-backdrop-filter: var(--sa-glass-blur);
 }
 
 // ── Image at the top, fading into the page ─────
+// The mask fades the image itself to transparent, so it melts into the glows of the page
+// background (global.scss) instead of ending in a solid color.
 .hero {
   position: relative;
   height: 250px;
   overflow: hidden;
+  mask-image: linear-gradient(180deg, #000 45%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, #000 45%, transparent 100%);
 
   &::after {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(
-      180deg,
-      rgba(15, 11, 11, 0.2) 0%,
-      rgba(15, 11, 11, 0.55) 55%,
-      var(--ion-background-color) 100%
-    );
+    background: linear-gradient(180deg, rgba(15, 11, 11, 0.2) 0%, rgba(15, 11, 11, 0.55) 100%);
   }
 }
 
@@ -85,8 +89,12 @@ ion-back-button {
 
 // ── Fixed bottom button ────────────────────────
 .footer {
-  background: var(--sa-bar);
-  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  // Frosted glass bar: the content scrolls under it (ion-content is fullscreen).
+  background: var(--sa-glass-bar);
+  border-top: 1px solid var(--sa-glass-border);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
   padding: 14px 20px calc(14px + env(safe-area-inset-bottom));
 }
 

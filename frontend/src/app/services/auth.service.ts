@@ -4,8 +4,9 @@ import { Preferences } from '@capacitor/preferences';
 import { firstValueFrom } from 'rxjs';
 
 import { AuthApi } from '../api/auth.api';
+import { UsersApi } from '../api/users.api';
 import type { LoginCredentials, Session, SignupData } from '../models/auth.model';
-import type { User } from '../models/user.model';
+import type { ProfileChanges, User } from '../models/user.model';
 import { UserType } from '../models/user.model';
 
 // Where the JWT is saved on the phone (Preferences = localStorage in the browser).
@@ -16,6 +17,7 @@ const TOKEN_KEY = 'spoileralert.token';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private api = inject(AuthApi);
+  private usersApi = inject(UsersApi);
 
   private tokenSignal = signal<string | null>(null);
   private userSignal = signal<User | null>(null);
@@ -40,6 +42,18 @@ export class AuthService {
 
   async signup(data: SignupData): Promise<void> {
     await this.start(await firstValueFrom(this.api.register(data)));
+  }
+
+  // PATCH /users/me (Edit profile). The new username / email shows everywhere at once,
+  // because every screen reads them from user().
+  async updateProfile(changes: ProfileChanges): Promise<void> {
+    this.userSignal.set(await firstValueFrom(this.usersApi.updateMe(changes)));
+  }
+
+  // DELETE /users/me, then the same as logout. If the API fails, the session stays open.
+  async deleteAccount(): Promise<void> {
+    await firstValueFrom(this.usersApi.deleteMe(), { defaultValue: undefined });
+    await this.logout();
   }
 
   async logout(): Promise<void> {

@@ -4,7 +4,7 @@ import { addIcons } from 'ionicons';
 import { closeOutline, trashOutline } from 'ionicons/icons';
 
 import { REVIEW_POINTS_DEFAULT } from '../../constants/review-limits';
-import type { Program } from '../../models/program.model';
+import type { ProgramSummary } from '../../models/program.model';
 import type { Review, ReviewInput } from '../../models/review.model';
 import { UserType } from '../../models/user.model';
 import { ButtonComponent } from '../button/button.component';
@@ -18,7 +18,8 @@ import { ProgramReviewCardComponent } from '../program-review-card/program-revie
 //   my-comment-section   → optional comment, max 300
 //   Delete review        → only when editing
 // Without `review` it creates one ("Your review" / "Publish review"); with `review` it edits it
-// ("Edit review" / "Save changes"). It doesn't call the API: it emits and the page does.
+// ("Edit review" / "Cancel" + "Save changes"). It doesn't call the API: it emits and the page does.
+// Used by Details and by My profile; `program` can be a full Program or a ProgramSummary.
 // <app-my-review-sheet [isOpen]="open" [program]="p" [review]="mine" [userType]="type"
 //                      [busy]="saving" [error]="err"
 //                      (submitted)="save($event)" (deleted)="delete()" (closed)="open = false" />
@@ -43,8 +44,9 @@ export class MyReviewSheetComponent {
   private alertCtrl = inject(AlertController);
 
   isOpen = input(false);
-  program = input.required<Program>();
-  review = input<Review | null>(null);
+  program = input.required<ProgramSummary>();
+  // Only points and comment are used, so a Review (Details) or a UserReview (My profile) both work.
+  review = input<Pick<Review, 'points' | 'comment'> | null>(null);
   userType = input<UserType>(UserType.NORMAL);
   busy = input(false);
   error = input<string | null>(null);

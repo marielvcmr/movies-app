@@ -1,0 +1,74 @@
+:host {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 16px;
+  background: var(--sa-glass-bg); // liquid glass (theme/variables.scss)
+  border: 1px solid var(--sa-glass-border);
+  box-shadow: var(--sa-glass-shadow);
+  backdrop-filter: var(--sa-glass-blur);
+  -webkit-backdrop-filter: var(--sa-glass-blur);
+}
+
+.poster {
+  width: 48px;
+  flex: none;
+}
+
+.info {
+  flex: 1;
+  min-width: 0;
+}
+
+p {
+  margin: 0;
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.text {
+  min-width: 0;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.meta {
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--sa-text-muted);
+}
+
+.points {
+  flex: none;
+  text-align: right;
+}
+
+.number {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.max {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--sa-text-muted);
+}
+
+.stars {
+  margin-top: 6px;
+}
+
+.comment {
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #e4dcd8;
+}

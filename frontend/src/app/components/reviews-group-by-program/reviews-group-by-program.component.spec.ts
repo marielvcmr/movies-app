@@ -1,5 +1,6 @@
 import type { ComponentFixture } from '@angular/core/testing';
 import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 
 import type { ProgramReview } from '../../models/review.model';
 
@@ -20,6 +21,7 @@ describe('ReviewsGroupByProgramComponent', () => {
   const html = () => fixture.nativeElement as HTMLElement;
 
   function render(inputs: Record<string, unknown>) {
+    TestBed.configureTestingModule({ providers: [provideRouter([])] });
     fixture = TestBed.createComponent(ReviewsGroupByProgramComponent);
     fixture.componentRef.setInput('group', 'audience');
     fixture.componentRef.setInput('reviews', []);
@@ -35,6 +37,13 @@ describe('ReviewsGroupByProgramComponent', () => {
     fixture.componentInstance.loadMore.subscribe(() => loadMoreClicks++);
     html().querySelector<HTMLButtonElement>('.load-more')?.click();
     expect(loadMoreClicks).toBe(1);
+  });
+
+  it("links each review to its author's profile, and mine to My profile", () => {
+    render({ reviews: [REVIEW, { ...REVIEW, _id: 'r2', author: { ...REVIEW.author, _id: 'me' } }], myUserId: 'me' });
+    const links = html().querySelectorAll('a.review-link');
+    expect(links[0].getAttribute('href')).toBe('/users/u1');
+    expect(links[1].getAttribute('href')).toBe('/tabs/profile');
   });
 
   it('shows the empty message for the group', () => {

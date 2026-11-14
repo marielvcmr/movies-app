@@ -98,4 +98,20 @@ describe('AuthService + authInterceptor', () => {
     await expect(done).rejects.toMatchObject({ status: 401 });
     expect(navStub.navigateRoot).not.toHaveBeenCalled();
   });
+
+  it('updateProfile sends PATCH /users/me and shows the new username at once', async () => {
+    const login = auth.login({ login: 'ana', password: 'secret123' });
+    http.expectOne(`${environment.apiUrl}/auth/login`).flush({ token: 'jwt-1', user: USER });
+    await login;
+
+    const done = auth.updateProfile({ username: 'ana.m' });
+    await flushPromises();
+    const req = http.expectOne(`${environment.apiUrl}/users/me`);
+    expect(req.request.method).toBe('PATCH');
+    expect(req.request.headers.get('Authorization')).toBe('Bearer jwt-1');
+    req.flush({ user: { ...USER, username: 'ana.m' } });
+    await done;
+
+    expect(auth.user()?.username).toBe('ana.m');
+  });
 });

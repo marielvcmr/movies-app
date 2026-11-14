@@ -70,6 +70,9 @@ export interface Series extends ProgramBase {
 // TypeScript knows `program.durationMin` exists.
 export type Program = Movie | Series;
 
+// The short version of a program that comes inside a user's review list (GET /users/:id/reviews).
+export type ProgramSummary = Pick<Program, '_id' | 'title' | 'type' | 'year' | 'posterUrl'>;
+
 // What the Home filter panel edits. api/programs.api.ts turns it into query params.
 export interface ProgramFilters {
   sort: ProgramSort;

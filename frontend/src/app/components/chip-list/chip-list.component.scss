@@ -15,7 +15,11 @@ ul {
   height: 30px;
   padding: 0 12px;
   border-radius: 15px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid var(--sa-glass-border);
+  background: var(--sa-glass-bg-soft); // liquid glass (theme/variables.scss)
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: var(--sa-glass-blur);
+  -webkit-backdrop-filter: var(--sa-glass-blur);
   display: inline-flex;
   align-items: center;
   font-size: 12px;

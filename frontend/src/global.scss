@@ -45,11 +45,69 @@
   line-height: 0.95;
 }
 
-/* Text field used in every form: <ion-input class="sa-field">. */
+/* ── Liquid glass ──────────────────────────────────────────────
+   Glass needs something colorful behind it to blur, so every page gets soft glows of the
+   app colors (red, amber, plum) on its dark background. They are on ion-content, which
+   doesn't scroll, so the cards slide over the glows. Sheets set their own background. */
+ion-content {
+  --background:
+    radial-gradient(620px 440px at 105% -6%, rgba(219, 49, 37, 0.3), transparent 70%),
+    radial-gradient(520px 520px at -14% 42%, rgba(245, 184, 61, 0.12), transparent 70%),
+    radial-gradient(640px 520px at 92% 108%, rgba(122, 46, 79, 0.34), transparent 70%), var(--ion-background-color);
+}
+
+/* The tab bar floats over the tab pages (see pages/tabs): room at the end of their scroll
+   so the last card isn't hidden behind it. */
+app-tabs ion-content {
+  --padding-bottom: calc(92px + env(safe-area-inset-bottom));
+}
+
+/* Any element can be a glass panel: <div class="sa-glass">. Components use the same tokens. */
+.sa-glass {
+  background: var(--sa-glass-bg);
+  border: 1px solid var(--sa-glass-border);
+  box-shadow: var(--sa-glass-shadow);
+  backdrop-filter: var(--sa-glass-blur);
+  -webkit-backdrop-filter: var(--sa-glass-blur);
+}
+
+/* Bottom sheet (filters, write a review, edit profile): <ion-modal class="sa-sheet">.
+   Frosted glass: the page shows blurred behind it. Its ion-content is transparent,
+   so it doesn't get the page glows above. */
+ion-modal.sa-sheet {
+  --background: var(--sa-glass-bar);
+  --border-radius: 28px;
+  --handle-background: rgba(255, 255, 255, 0.35);
+}
+
+ion-modal.sa-sheet::part(content) {
+  border-top: 1px solid var(--sa-glass-border);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 -12px 40px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(30px) saturate(170%);
+  -webkit-backdrop-filter: blur(30px) saturate(170%);
+}
+
+ion-modal.sa-sheet ion-toolbar {
+  --background: transparent;
+  --border-width: 0;
+}
+
+ion-modal.sa-sheet ion-content {
+  --background: transparent;
+}
+
+ion-modal.sa-sheet ion-footer {
+  background: transparent;
+  border-top: 1px solid var(--sa-glass-border);
+}
+
+/* Text field used in every form: <ion-input class="sa-field">. Glass pill. */
 ion-input.sa-field {
-  --background: rgba(255, 255, 255, 0.05);
+  --background: transparent; // the glass is on the host, below
   --color: var(--ion-text-color);
-  --placeholder-color: #8a817d;
+  --placeholder-color: #9a908c;
   --placeholder-opacity: 1;
   --padding-start: 20px; // a bit more room because of the rounded ends
   --padding-end: 12px;
@@ -57,15 +115,23 @@ ion-input.sa-field {
   --highlight-color-valid: var(--sa-accent-text);
   --highlight-color-invalid: var(--sa-danger-text);
   min-height: 54px;
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: var(--sa-glass-bg);
+  border: 1px solid var(--sa-glass-border);
   border-radius: 999px; // pill, same as <app-button>
+  box-shadow: var(--sa-glass-shadow);
+  backdrop-filter: var(--sa-glass-blur);
+  -webkit-backdrop-filter: var(--sa-glass-blur);
   font-size: 15px;
   font-weight: 500;
   overflow: hidden;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 
 ion-input.sa-field.has-focus {
   border-color: rgba(255, 90, 77, 0.65);
+  box-shadow: var(--sa-glass-shadow), var(--sa-glass-focus);
 }
 
 ion-input.sa-field.sa-field-error {
@@ -93,13 +159,17 @@ ion-input.sa-field ion-input-password-toggle {
 }
 
 /* Two-option switch with the selected one in red: <ion-segment class="sa-segment">.
-   Used by account-entry-selector (Log in / Sign up) and program-selector (Movies / Series).
-   Each one only changes --sa-segment-background. */
+   Used by account-entry-selector (Log in / Sign up), program-selector (Movies / Series),
+   user-type-selector (Critics / Audience) and the Users module. Glass track with a red glass
+   pill on the selected option. A selector can tint the track with --sa-segment-background. */
 ion-segment.sa-segment {
-  --background: var(--sa-segment-background, var(--sa-surface));
+  --background: var(--sa-segment-background, var(--sa-glass-bg));
   padding: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 14px;
+  border: 1px solid var(--sa-glass-border);
+  border-radius: 16px;
+  box-shadow: var(--sa-glass-shadow);
+  backdrop-filter: var(--sa-glass-blur);
+  -webkit-backdrop-filter: var(--sa-glass-blur);
 }
 
 ion-segment.sa-segment ion-segment-button {
@@ -107,10 +177,10 @@ ion-segment.sa-segment ion-segment-button {
   --background-checked: transparent;
   --color: #b7aeaa;
   --color-checked: #ffffff;
-  --indicator-color: var(--ion-color-primary);
+  --indicator-color: var(--sa-glass-accent);
   --indicator-height: 100%;
-  --indicator-box-shadow: none;
-  --border-radius: 10px;
+  --indicator-box-shadow: var(--sa-glass-accent-shadow);
+  --border-radius: 12px;
   --border-width: 0;
   min-height: 44px;
   margin: 0;
@@ -127,5 +197,6 @@ ion-segment.sa-segment ion-segment-button::part(indicator) {
 }
 
 ion-segment.sa-segment ion-segment-button::part(indicator-background) {
-  border-radius: 10px;
+  border-radius: 12px;
+  box-shadow: var(--sa-glass-accent-shadow);
 }
