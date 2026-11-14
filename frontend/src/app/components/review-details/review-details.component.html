@@ -1,0 +1,24 @@
+<article>
+  <header>
+    <span class="avatar" [style.background-color]="avatar()" aria-hidden="true">{{ initial() }}</span>
+    <div class="who">
+      <div class="name-row">
+        <!-- TODO: link to the public profile (/users/:id) once that screen exists. -->
+        <span class="username">{{ username() }}</span>
+        @if (isCritic()) {
+          <span class="critic-badge">Critic</span>
+        }
+      </div>
+      <time class="date" [attr.datetime]="review().createdAt">{{ date() }}</time>
+    </div>
+    <div class="points">
+      <span class="number font-display">{{ review().points }}</span><span class="max">/100</span>
+    </div>
+  </header>
+
+  <app-star-rating class="stars" [points]="review().points" [size]="15" />
+
+  @if (review().comment) {
+    <p class="comment">{{ review().comment }}</p>
+  }
+</article>

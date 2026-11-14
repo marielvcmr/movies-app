@@ -1,10 +1,13 @@
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
 import { firstValueFrom } from 'rxjs';
 
+import { environment } from '../../environments/environment';
 import { DEFAULT_FILTERS, YEAR_MAX, YEAR_MIN } from '../constants/filters';
 import type { ProgramQuery } from '../models/program.model';
 
-import { mockGetProgram, mockListPrograms } from './mocks/programs.mock';
-import { toQueryParams } from './programs.api';
+import { ProgramsApi, toQueryParams } from './programs.api';
 
 const QUERY: ProgramQuery = { type: 'movie', q: '', filters: DEFAULT_FILTERS, page: 1 };
 
@@ -45,26 +48,29 @@ describe('toQueryParams', () => {
   });
 });
 
-describe('programs mock', () => {
-  it('filters by type, text and minimum stars, newest first', async () => {
-    // 5 stars = 81+ points: Dune: Part Two (92) and Dune (83) pass.
-    const fiveStars = await firstValueFrom(
-      mockListPrograms({ ...QUERY, q: 'dune', filters: { ...DEFAULT_FILTERS, minCriticsStars: 5 } }, 20),
-    );
-    expect(fiveStars.data.map((p) => p.title)).toEqual(['Dune: Part Two', 'Dune']);
+describe('ProgramsApi', () => {
+  let api: ProgramsApi;
+  let http: HttpTestingController;
 
-    const series = await firstValueFrom(mockListPrograms({ ...QUERY, type: 'series', q: 'dune' }, 20));
-    expect(series.total).toBe(0);
+  beforeEach(() => {
+    TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] });
+    api = TestBed.inject(ProgramsApi);
+    http = TestBed.inject(HttpTestingController);
   });
 
-  it('paginates', async () => {
-    const page2 = await firstValueFrom(mockListPrograms({ ...QUERY, page: 2 }, 4));
-    expect(page2.page).toBe(2);
-    expect(page2.data.length).toBe(4);
-    expect(page2.total).toBe(9);
+  afterEach(() => http.verify());
+
+  it('lists from GET /programs', async () => {
+    const result = firstValueFrom(api.list({ ...QUERY, q: 'dune' }));
+    const req = http.expectOne((r) => r.url === `${environment.apiUrl}/programs`);
+    expect(req.request.params.get('q')).toBe('dune');
+    req.flush({ data: [], page: 1, limit: 20, total: 0 });
+    expect((await result).total).toBe(0);
   });
 
-  it('answers 404 for an unknown id', async () => {
-    await expect(firstValueFrom(mockGetProgram('nope'))).rejects.toMatchObject({ status: 404 });
+  it('unwraps { program } from GET /programs/:id', async () => {
+    const result = firstValueFrom(api.getById('abc'));
+    http.expectOne(`${environment.apiUrl}/programs/abc`).flush({ program: { _id: 'abc', title: 'Dune' } });
+    expect((await result).title).toBe('Dune');
   });
 });

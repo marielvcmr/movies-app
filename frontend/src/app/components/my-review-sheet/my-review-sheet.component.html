@@ -1,0 +1,44 @@
+<ion-modal
+  [isOpen]="isOpen()"
+  [initialBreakpoint]="0.92"
+  [breakpoints]="[0, 0.92]"
+  (willPresent)="prepare()"
+  (didDismiss)="closed.emit()"
+>
+  <ng-template>
+    <ion-header class="ion-no-border">
+      <ion-toolbar>
+        <div class="sheet-header">
+          <h2 class="font-display">{{ heading() }}</h2>
+          <button type="button" class="close" aria-label="Close" (click)="closed.emit()">
+            <ion-icon name="close-outline" aria-hidden="true" />
+          </button>
+        </div>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content>
+      <div class="sections">
+        <app-program-review-card [program]="program()" />
+        <app-my-score-card [(points)]="points" />
+        <app-my-comment-section [(comment)]="comment" [userType]="userType()" />
+
+        @if (isEdit()) {
+          <button type="button" class="delete" [disabled]="busy()" (click)="askDelete()">
+            <ion-icon name="trash-outline" aria-hidden="true" />
+            Delete review
+          </button>
+        }
+      </div>
+    </ion-content>
+
+    <ion-footer class="ion-no-border">
+      <div class="actions">
+        @if (error()) {
+          <p class="error" role="alert">{{ error() }}</p>
+        }
+        <app-button [disabled]="busy()" (click)="submit()">{{ saveLabel() }}</app-button>
+      </div>
+    </ion-footer>
+  </ng-template>
+</ion-modal>

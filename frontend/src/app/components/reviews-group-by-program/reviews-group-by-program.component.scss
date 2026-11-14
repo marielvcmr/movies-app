@@ -1,0 +1,41 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.load-more {
+  height: 46px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: transparent;
+  color: var(--ion-text-color);
+  font: 700 13px var(--ion-font-family);
+  cursor: pointer;
+}
+
+.loading {
+  padding: 16px 0;
+  display: flex;
+  justify-content: center;
+}
+
+.message {
+  margin: 8px 0;
+  text-align: center;
+  font-size: 14px;
+  color: var(--sa-text-muted);
+
+  p {
+    margin: 0;
+  }
+}
+
+.link {
+  margin-top: 6px;
+  padding: 8px;
+  background: transparent;
+  color: var(--sa-accent-text);
+  font: 700 14px var(--ion-font-family);
+  cursor: pointer;
+}

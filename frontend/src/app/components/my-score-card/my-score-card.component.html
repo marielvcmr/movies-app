@@ -1,0 +1,25 @@
+<section>
+  <h3 id="my-score-label">Your score</h3>
+
+  <div class="value-row">
+    <div class="value">
+      <span class="number font-display">{{ points() }}</span><span class="max">/100</span>
+    </div>
+    <app-star-rating [points]="points()" [size]="24" />
+  </div>
+
+  <ion-range
+    aria-labelledby="my-score-label"
+    [min]="min"
+    [max]="max"
+    [step]="1"
+    [value]="points()"
+    (ionInput)="onInput($event)"
+  />
+  <div class="range-ends">
+    <span>{{ min }}</span>
+    <span>{{ max }}</span>
+  </div>
+
+  <app-score-stars class="scale" [points]="points()" />
+</section>

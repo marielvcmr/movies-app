@@ -20,10 +20,9 @@ describe('ProgramSelectorComponent', () => {
   });
 
   it('shows Movies and Series', () => {
-    const labels = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('ion-label')).map((label) =>
-      label.textContent?.trim(),
-    );
-    expect(labels).toEqual(['Movies', 'Series']);
+    // (Ionic's ion-label hides its textContent in jsdom, so check the options and the buttons.)
+    expect(component.options.map((option) => option.label)).toEqual(['Movies', 'Series']);
+    expect((fixture.nativeElement as HTMLElement).querySelectorAll('ion-segment-button').length).toBe(2);
   });
 
   it('emits the other type when it is picked', () => {

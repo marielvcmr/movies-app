@@ -1,0 +1,60 @@
+:host {
+  display: block;
+}
+
+.chips {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+// Smaller than the chips of the filter popup (38px) so the row doesn't push the grid down much.
+.chip {
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: transparent;
+  color: var(--sa-text-muted);
+  font: 700 12px var(--ion-font-family);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+
+  ion-icon {
+    font-size: 14px;
+  }
+}
+
+// A filter the user turned on: same red look as a selected chip in the popup.
+.chip.on {
+  border-color: var(--ion-color-primary);
+  background: rgba(219, 49, 37, 0.18);
+  color: #ffffff;
+  cursor: pointer;
+
+  .x {
+    margin-right: -3px;
+    color: var(--sa-text-soft);
+  }
+}
+
+ion-icon[data-group='critics'] {
+  color: var(--sa-accent-text);
+}
+
+ion-icon[data-group='audience'] {
+  color: var(--sa-star);
+}
+
+.clear {
+  height: 28px;
+  padding: 0 6px;
+  background: transparent;
+  color: var(--sa-accent-text);
+  font: 700 12px var(--ion-font-family);
+  cursor: pointer;
+}

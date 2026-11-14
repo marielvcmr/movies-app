@@ -1,0 +1,70 @@
+:host {
+  display: block;
+}
+
+section {
+  padding: 18px;
+  border-radius: 18px;
+  background: var(--sa-surface);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+h3 {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sa-text-muted);
+}
+
+.value-row {
+  margin-top: 8px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  app-star-rating {
+    padding-bottom: 8px;
+  }
+}
+
+.value {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.number {
+  font-size: 72px;
+  line-height: 0.9;
+}
+
+.max {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--sa-text-muted);
+}
+
+ion-range {
+  --bar-background: rgba(255, 255, 255, 0.14);
+  --bar-background-active: var(--ion-color-primary);
+  --knob-background: #ffffff;
+  --knob-size: 22px;
+  --bar-height: 4px;
+  margin-top: 6px;
+  padding: 0 4px;
+}
+
+.range-ends {
+  display: flex;
+  justify-content: space-between;
+  margin-top: -6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--sa-text-muted);
+}
+
+.scale {
+  margin-top: 14px;
+}

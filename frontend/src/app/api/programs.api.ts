@@ -9,25 +9,20 @@ import type { Page } from '../models/api.model';
 import type { Program, ProgramQuery } from '../models/program.model';
 import { starsToMinPoints } from '../utils/stars';
 
-import { mockGetProgram, mockListPrograms } from './mocks/programs.mock';
-
 // Calls to /programs (backend/README.md → Programas).
-// While environment.mockPrograms is true, the same methods answer with sample data instead.
 @Injectable({ providedIn: 'root' })
 export class ProgramsApi {
   private http = inject(HttpClient);
   private url = `${environment.apiUrl}/programs`;
 
   // One page of a tab (movies or series) with search, filters and sort.
+  // With a search text, the API first imports from OMDb the titles it doesn't have yet.
   list(query: ProgramQuery): Observable<Page<Program>> {
-    if (environment.mockPrograms) return mockListPrograms(query, PROGRAMS_PAGE_SIZE);
     return this.http.get<Page<Program>>(this.url, { params: toQueryParams(query) });
   }
 
-  // Full detail of one program.
-  // Assumes the API wraps it like GET /auth/me does ({ user }): { program }. Adjust here if not.
+  // Full detail of one program. The first time it's opened, the API completes it from OMDb.
   getById(id: string): Observable<Program> {
-    if (environment.mockPrograms) return mockGetProgram(id);
     return this.http.get<{ program: Program }>(`${this.url}/${id}`).pipe(map((res) => res.program));
   }
 }

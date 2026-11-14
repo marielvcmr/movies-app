@@ -11,7 +11,6 @@ ul {
   gap: 8px;
 }
 
-// Categories: outlined
 .chip {
   height: 30px;
   padding: 0 12px;
@@ -22,30 +21,4 @@ ul {
   font-size: 12px;
   font-weight: 700;
   color: var(--sa-text-soft);
-}
-
-// Actors: filled, with a circle holding the initial
-:host(.with-avatars) .chip {
-  height: 34px;
-  padding: 0 12px 0 4px;
-  gap: 8px;
-  border: 0;
-  border-radius: 17px;
-  background: var(--sa-surface);
-  color: var(--ion-text-color);
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.initial {
-  width: 26px;
-  height: 26px;
-  border-radius: 13px;
-  background: #2a2020;
-  color: var(--sa-text-soft);
-  font-size: 11px;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }

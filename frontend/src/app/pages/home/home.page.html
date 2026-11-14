@@ -9,6 +9,8 @@
       <app-search-filter [(filters)]="filters" />
     </div>
 
+    <app-active-filters class="active-filters" [(filters)]="filters" />
+
     @if (error()) {
     <div class="message" role="alert">
       <p class="message-title">Couldn't load the list</p>

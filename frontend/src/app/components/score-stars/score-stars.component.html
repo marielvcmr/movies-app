@@ -1,0 +1,8 @@
+<ul aria-label="Score scale">
+  @for (band of bands(); track band.stars) {
+    <li [class.active]="band.active" [attr.aria-current]="band.active ? 'true' : null">
+      <span class="range">{{ band.range }}</span>
+      <span class="label">{{ band.label }}</span>
+    </li>
+  }
+</ul>

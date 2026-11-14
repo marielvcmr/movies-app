@@ -33,9 +33,24 @@
 
     @if (p.actors.length) {
     <app-detail-section class="block" heading="Actors">
-      <app-chip-list [items]="p.actors" [avatars]="true" />
+      <app-actor-list [actors]="p.actors" />
     </app-detail-section>
     }
+
+    <section class="reviews">
+      <h2 class="font-display">Reviews</h2>
+      <app-user-type-selector class="selector" [(group)]="reviewGroup" />
+      <app-reviews-group-by-program
+        class="list"
+        [group]="reviewGroup()"
+        [reviews]="reviews()"
+        [hasMore]="hasMoreReviews()"
+        [loading]="reviewsLoading()"
+        [error]="reviewsError()"
+        (loadMore)="loadMoreReviews()"
+        (retry)="loadReviews(1)"
+      />
+    </section>
   </main>
   } @else if (error()) {
   <div class="message" role="alert">
@@ -48,10 +63,22 @@
   }
 </ion-content>
 
-@if (program()) {
+@if (program(); as p) {
 <ion-footer class="ion-no-border">
   <div class="footer">
-    <app-button icon="create-outline" (click)="writeReview()">Write a review</app-button>
+    <app-button icon="create-outline" (click)="openSheet()">{{ reviewButtonLabel() }}</app-button>
   </div>
 </ion-footer>
+
+<app-my-review-sheet
+  [isOpen]="sheetOpen()"
+  [program]="p"
+  [review]="myReview()"
+  [userType]="userType()"
+  [busy]="saving()"
+  [error]="sheetError()"
+  (submitted)="saveReview($event)"
+  (deleted)="deleteReview()"
+  (closed)="sheetOpen.set(false)"
+/>
 }

@@ -111,16 +111,26 @@ La app tiene dos módulos para todos los usuarios, **Home** y **My profile**, y 
 | `program-selector` | Home        | Selector *Movies / Series*: `[(type)]`. Mismos estilos que `account-entry-selector` (`.sa-segment` en `global.scss`). |
 | `search-bar`      | Home         | Buscador por nombre: `[(query)]`, espera 350 ms después de la última tecla. |
 | `search-filter`   | Home         | Botón con contador + popup (hoja inferior): orden, categorías (dropdown que va añadiendo chips), rango de años y estrellas mínimas de críticos y audiencia. `[(filters)]`; solo aplica al tocar *Apply*. |
+| `active-filters`  | Home         | Debajo del buscador: un chip por filtro activo (orden, cada categoría, años, estrellas de críticos y de audiencia). La × de cada chip quita ese filtro; *Clear* vuelve a los valores por defecto. `[(filters)]`. |
 | `program-card-simple` | Home, Details, My review | Carátula de un programa: imagen de OMDb o recuadro de color con el título; icono de película o serie según `type`. `size="large" \| "small"`. |
 | `program-home-card` | Home       | `program-card-simple` + título, año, dos primeras categorías y los dos promedios. |
 | `program-detail-card` | Details  | `program-card-simple` pequeña + tipo, título y año · duración (película) o temporadas (serie). |
 | `score-detail-card` | Details    | Un promedio: `group="critics"` (insignia roja, `pointsMeanCritics`) o `group="audience"` (personas amarillas, `pointsMeanNormal`). Número, estrellas y cantidad de reseñas. |
 | `program-facts`   | Details      | Lista *Released* + *Duration* o *Seasons*. Omite las filas sin dato. |
-| `chip-list`       | Details      | Fila de etiquetas: categorías, o actores con `[avatars]="true"`. |
+| `chip-list`       | Details      | Fila de etiquetas con borde: las categorías. |
+| `actor-list`      | Details      | Los actores, un `actor-chip` por cada uno. |
+| `actor-chip`      | Details      | Un actor: círculo con su inicial + nombre. |
 | `detail-section`  | Details      | Bloque con título (`heading`) y contenido libre entre las etiquetas: *Synopsis*, *Actors*. |
+| `user-type-selector` | Details   | Selector *Critics / Audience* de las reseñas: `[(group)]`. |
+| `reviews-group-by-program` | Details | Las reseñas de un grupo (`review-details` × N), *Load more reviews* y mensajes de vacío / error. Emite `(loadMore)` y `(retry)`. |
+| `review-details`  | Details, perfiles | Una reseña: avatar con inicial, username, insignia *Critic*, fecha, puntaje /100, estrellas y comentario si lo hay. |
+| `my-review-sheet` | Details      | Popup *Write a review* / *Edit review* (hoja inferior, como el de filtros) con `program-review-card`, `my-score-card` y `my-comment-section`; *Delete review* al editar. No llama a la API: emite `(submitted)` y `(deleted)`. |
+| `program-review-card` | Write a review, perfiles | `program-card-simple size="mini"` + título + "Movie · 2024 · 166 min". |
+| `my-score-card`   | Write a review | *Your score*: número grande, estrellas en vivo, deslizador 1–100 y `score-stars`. `[(points)]`. |
+| `score-stars`     | Write a review | La escala 1–20 … 81–100 = 1 … 5 estrellas, con la franja del puntaje actual resaltada. |
+| `my-comment-section` | Write a review | Comentario opcional con contador 0/300 y aviso de a qué promedio cuenta según `userType` (critic → Critics; normal/admin → Audience). `[(comment)]`. |
 | `star-rating`     | Details, filtros, My review, perfiles | Las 5 estrellas a partir de `points` (o directamente `stars`). |
 | `tab-bar`         | Home, My profile, Users | Pestañas inferiores; *Users* solo si `showUsers` (admin). |
-| `review-item`     | Details, perfiles | *(Pendiente)* Autor (con enlace a su perfil), insignia de crítico, fecha, puntaje, estrellas y comentario si lo hay. |
 | `user-type-badge` | Perfiles, Users | *(Pendiente)* Insignia *Normal user*, *Critic* o *Admin*. |
 
 ---

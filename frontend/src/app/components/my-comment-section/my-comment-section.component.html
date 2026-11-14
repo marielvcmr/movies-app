@@ -1,0 +1,22 @@
+<section>
+  <label for="my-comment" class="label-row">
+    <span class="label">Comment <span class="optional">(optional)</span></span>
+    <span class="counter">{{ counter() }}</span>
+  </label>
+
+  <div class="field">
+    <textarea
+      id="my-comment"
+      rows="5"
+      placeholder="What did you think? Avoid spoilers!"
+      [attr.maxlength]="maxLength"
+      [value]="comment()"
+      (input)="onInput($event)"
+    ></textarea>
+  </div>
+
+  <p class="note">
+    <ion-icon name="information-circle-outline" aria-hidden="true" />
+    {{ countsToward() }}
+  </p>
+</section>

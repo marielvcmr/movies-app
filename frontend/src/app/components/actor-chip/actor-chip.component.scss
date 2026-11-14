@@ -1,0 +1,24 @@
+:host {
+  height: 34px;
+  padding: 0 12px 0 4px;
+  border-radius: 17px;
+  background: var(--sa-surface);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.initial {
+  width: 26px;
+  height: 26px;
+  border-radius: 13px;
+  background: #2a2020;
+  color: var(--sa-text-soft);
+  font-size: 11px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

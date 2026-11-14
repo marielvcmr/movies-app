@@ -46,7 +46,7 @@ describe('HomePage', () => {
   it('loads the first page of movies and shows one card per program', () => {
     expect(listSpy).toHaveBeenLastCalledWith({ type: 'movie', q: '', filters: DEFAULT_FILTERS, page: 1 });
     expect((fixture.nativeElement as HTMLElement).querySelectorAll('app-program-home-card').length).toBe(1);
-    expect(page.summary()).toBe('1 movie · Newest first');
+    expect(page.summary()).toBe('1 movie');
   });
 
   it('reloads from page 1 when the tab changes', async () => {

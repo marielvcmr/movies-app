@@ -24,3 +24,15 @@ export function formatCount(count: number | null, singular: string, plural = `${
   if (count === null) return null;
   return `${count} ${count === 1 ? singular : plural}`;
 }
+
+// Length of a movie or series: "166 min" or "2 seasons". null when OMDb didn't give it.
+// Takes only the fields it needs, so this file still doesn't depend on the app's models.
+export function formatProgramLength(program: {
+  type: 'movie' | 'series';
+  durationMin?: number | null;
+  seasonsCount?: number | null;
+}): string | null {
+  return program.type === 'movie'
+    ? formatMinutes(program.durationMin ?? null)
+    : formatCount(program.seasonsCount ?? null, 'season');
+}

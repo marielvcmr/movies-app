@@ -12,13 +12,13 @@ import type { Subscription } from 'rxjs';
 
 import { apiErrorMessage } from '../../api/api-error';
 import { ProgramsApi } from '../../api/programs.api';
+import { ActiveFiltersComponent } from '../../components/active-filters/active-filters.component';
 import { HomeHeaderComponent } from '../../components/home-header/home-header.component';
 import { ProgramHomeCardComponent } from '../../components/program-home-card/program-home-card.component';
 import { ProgramSelectorComponent } from '../../components/program-selector/program-selector.component';
 import { SearchBarComponent } from '../../components/search-bar/search-bar.component';
 import { SearchFilterComponent } from '../../components/search-filter/search-filter.component';
 import { DEFAULT_FILTERS } from '../../constants/filters';
-import { SORT_LABELS } from '../../constants/labels';
 import type { Program, ProgramFilters, ProgramType } from '../../models/program.model';
 
 // Home: Movies / Series tabs, search, filters and the grid of cards.
@@ -39,6 +39,7 @@ import type { Program, ProgramFilters, ProgramType } from '../../models/program.
     ProgramSelectorComponent,
     SearchBarComponent,
     SearchFilterComponent,
+    ActiveFiltersComponent,
     ProgramHomeCardComponent,
   ],
 })
@@ -60,10 +61,11 @@ export class HomePage {
 
   hasMore = computed(() => this.programs().length < this.total());
   searchPlaceholder = computed(() => (this.type() === 'movie' ? 'Search movies by name' : 'Search series by name'));
+  // "10 movies". The sort and the other filters are shown as chips by <app-active-filters>.
   summary = computed(() => {
     const total = this.total();
     const noun = this.type() === 'series' ? 'series' : total === 1 ? 'movie' : 'movies';
-    return `${total} ${noun} · ${SORT_LABELS[this.filters().sort]}`;
+    return `${total} ${noun}`;
   });
 
   constructor() {

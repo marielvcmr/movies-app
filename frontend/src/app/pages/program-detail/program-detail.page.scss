@@ -65,6 +65,24 @@ ion-back-button {
   color: #e4dcd8;
 }
 
+// ── Reviews ────────────────────────────────────
+.reviews {
+  margin-top: 28px;
+
+  h2 {
+    margin: 0;
+    font-size: 30px;
+  }
+
+  .selector {
+    margin-top: 10px;
+  }
+
+  .list {
+    margin-top: 12px;
+  }
+}
+
 // ── Fixed bottom button ────────────────────────
 .footer {
   background: var(--sa-bar);

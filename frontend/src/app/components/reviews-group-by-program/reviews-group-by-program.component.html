@@ -1,0 +1,16 @@
+@for (review of reviews(); track review._id) {
+  <app-review-details [review]="review" />
+}
+
+@if (error()) {
+  <div class="message" role="alert">
+    <p>{{ error() }}</p>
+    <button type="button" class="link" (click)="retry.emit()">Try again</button>
+  </div>
+} @else if (loading()) {
+  <div class="loading"><ion-spinner name="crescent" aria-label="Loading reviews" /></div>
+} @else if (!reviews().length) {
+  <p class="message">{{ emptyText() }}</p>
+} @else if (hasMore()) {
+  <button type="button" class="load-more" (click)="loadMore.emit()">Load more reviews</button>
+}

@@ -1,0 +1,27 @@
+<ul class="chips" aria-label="Active filters">
+  @for (chip of chips(); track chip.id) {
+    <li>
+      @if (chip.without) {
+        <button type="button" class="chip on" [attr.aria-label]="'Remove filter ' + chip.label" (click)="remove(chip)">
+          @if (chip.icon) {
+            <ion-icon [name]="chip.icon" [attr.data-group]="chip.group" aria-hidden="true" />
+          }
+          {{ chip.label }}
+          <ion-icon class="x" name="close-outline" aria-hidden="true" />
+        </button>
+      } @else {
+        <span class="chip">
+          @if (chip.icon) {
+            <ion-icon [name]="chip.icon" aria-hidden="true" />
+          }
+          {{ chip.label }}
+        </span>
+      }
+    </li>
+  }
+  @if (canClear()) {
+    <li>
+      <button type="button" class="clear" (click)="clear()">Clear</button>
+    </li>
+  }
+</ul>
