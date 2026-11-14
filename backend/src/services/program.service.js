@@ -1,7 +1,9 @@
+import { AppError } from '../utils/AppError.js';
+import { HttpStatus } from '../constants/httpStatus.js';
 import { Program, Movie, Series } from '../models/Program.js';
 import { ProgramType, ProgramSort } from '../constants/enums.js';
 import { Pagination } from '../constants/queryLimits.js';
-import { searchTitles } from '../clients/omdb.js';
+import { searchTitles, getById } from '../clients/omdb.js';
 import { normalizeTitle, escapeRegex } from '../utils/text.js';
 
 const MODEL_BY_TYPE = Object.freeze({
@@ -81,4 +83,33 @@ export async function listPrograms(query) {
   ]);
 
   return { data, page, limit, total };
+}
+
+// Gets the full detail from OMDb and saves it. If OMDb fails, the program stays as it is.
+async function fillDetailFromOmdb(program) {
+  console.info(`OMDb detail: ${program.externalId}`);
+  const detail = await getById(program.externalId);
+  if (!detail) return; // OMDb failed: keep the stored data, try again next time.
+
+  const { releaseDate, synopsis, genres, actors, durationMin, seasonsCount } = detail;
+  program.set({ releaseDate, synopsis, genres, actors, detailFetchedAt: new Date() });
+
+  if (program.type === ProgramType.MOVIE) {
+    program.durationMin = durationMin;
+  } else {
+    program.seasonsCount = seasonsCount;
+  }
+  await program.save();
+}
+
+export async function getProgramById(programId) {
+  const program = await Program.findById(programId);
+  if (!program) {
+    throw new AppError(HttpStatus.NOT_FOUND, 'Program not found');
+  }
+
+  if (program.detailFetchedAt === null) {
+    await fillDetailFromOmdb(program);
+  }
+  return program;
 }

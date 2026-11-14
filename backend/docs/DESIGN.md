@@ -40,6 +40,7 @@ erDiagram
         int year
         date releaseDate
         string posterUrl
+        date detailFetchedAt
         string_array genres
         string_array actors
         number pointsMeanNormal
@@ -101,6 +102,7 @@ Las reseñas de un `admin` cuentan en el promedio de usuarios normales.
 | `year`              | Number         | Año de estreno (en series: el primer año). La búsqueda de OMDb solo trae el año; se usa para el filtro y el orden por fecha. |
 | `releaseDate`       | Date \| null   | Fecha exacta de estreno. Se completa al abrir la ficha. |
 | `posterUrl`         | String \| null | URL de la carátula que entrega OMDb. |
+| `detailFetchedAt`   | Date \| null   | Fecha en que se pidió el detalle a OMDb. `null` mientras solo se tienen los datos de la búsqueda. Uso interno: evita pedir el detalle dos veces, aunque OMDb no tenga sinopsis. |
 | `genres`            | [`Genre`]      | Categorías del título. |
 | `actors`            | [String]       | Actores principales, en el orden en que los entrega OMDb. |
 | `pointsMeanNormal`  | Number \| null | Promedio de las reseñas de usuarios normales (y admins). `null` si no hay. |

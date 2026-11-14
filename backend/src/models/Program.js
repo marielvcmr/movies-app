@@ -15,6 +15,8 @@ const programSchema = new mongoose.Schema(
     year: { type: Number, required: true },
     releaseDate: { type: Date, default: null },
     posterUrl: { type: String, default: null },
+        // null until the full detail comes from OMDb. Then it is never fetched again (even if OMDb has no plot).
+    detailFetchedAt: { type: Date, default: null },
     genres: { type: [{ type: String, enum: Object.values(Genre) }], default: [] },
     actors: { type: [String], default: [] },
     // null while the group has no reviews (Step 15 recalculates them).
@@ -28,6 +30,7 @@ const programSchema = new mongoose.Schema(
       // titleNormalized is internal (search only); __v is Mongoose bookkeeping.
       transform(doc, ret) {
         delete ret.titleNormalized;
+        delete ret.detailFetchedAt;
         delete ret.__v;
         return ret;
       },

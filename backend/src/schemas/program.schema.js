@@ -1,7 +1,8 @@
 import { z } from 'zod';
 import { ProgramType, ProgramSort, Genre } from '../constants/enums.js';
 import { ScoreFilter } from '../constants/queryLimits.js';
-import { paginationShape } from './common.schema.js';
+import { paginationShape, objectIdSchema } from './common.schema.js';
+
 
 const LIST_SEPARATOR = ',';
 
@@ -30,3 +31,7 @@ export const listProgramsQuerySchema = z
     ({ yearFrom, yearTo }) => yearFrom === undefined || yearTo === undefined || yearFrom <= yearTo,
     { message: 'yearFrom must not be after yearTo', path: ['yearTo'] },
   );
+
+  export const programIdParamsSchema = z.object({
+  id: objectIdSchema,
+});

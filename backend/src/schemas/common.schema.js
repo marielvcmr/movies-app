@@ -11,3 +11,8 @@ export const paginationShape = {
     .max(Pagination.MAX_LIMIT)
     .default(Pagination.DEFAULT_LIMIT),
 };
+
+// MongoDB ObjectId: 24 hexadecimal characters.
+const OBJECT_ID_PATTERN = /^[a-f\d]{24}$/i;
+
+export const objectIdSchema = z.string().regex(OBJECT_ID_PATTERN, 'must be a valid id');
